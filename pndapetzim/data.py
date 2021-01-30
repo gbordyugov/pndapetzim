@@ -25,10 +25,10 @@ class IntegerEncoding(BaseModel):
 
     @property
     def vocab_size(self):
-        return len(self.ix_to_value) + 1
+        return len(self.ix_to_value) + 1  # including zero for padding
 
     @staticmethod
-    def fromValues(values: Iterable[int], start_value=1) -> IntegerEncoding:
+    def fromValues(values: Iterable[int]) -> IntegerEncoding:
         """Construct an IntegerEncoding from an iterable of values."""
 
         ix_to_value = {}
@@ -36,7 +36,7 @@ class IntegerEncoding(BaseModel):
 
         sorted_set = sorted(set(values))
 
-        for ix, value in enumerate(sorted_set, start_value):
+        for ix, value in enumerate(sorted_set, 1):  # zero reserved for padding
             ix_to_value[ix] = value
             value_to_ix[value] = ix
 
