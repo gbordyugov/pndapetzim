@@ -150,7 +150,9 @@ def encode_int_column(
     return df, encoding
 
 
-def encode_df(df: DataFrame, columns: List[str] = CATEGORICAL_COLUMNS) -> Tuple[DataFrame, dict]:
+def encode_df(
+    df: DataFrame, columns: List[str] = CATEGORICAL_COLUMNS
+) -> Tuple[DataFrame, dict]:
     """Encode the columns with categorical features in a dataframe
     using the function encode_int_column() above.
 
@@ -221,16 +223,21 @@ def get_dataset_from_df(
             dates = pad_left(dates, seq_len)
 
             label = max(group[label_key])
-            yield (amounts, dates), int(label)
+
+            yield (
+                {
+                    amount_paid_key: amounts,
+                    order_date_key: dates,
+                },
+                int(label),
+            )
 
     signature = (
-        (
-            tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-            tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-        ),
+        {
+            amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+        },
         tf.TensorSpec(shape=(), dtype=tf.int32),
     )
 
-    return Dataset.from_generator(
-        generator, output_signature=signature
-    )
+    return Dataset.from_generator(generator, output_signature=signature)
