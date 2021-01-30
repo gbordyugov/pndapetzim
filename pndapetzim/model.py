@@ -15,11 +15,11 @@ def build_amount_date_model(seq_len, hidden_layer_dim=10):
         [amount_paid[:, :, na], order_date[:, :, na]], axis=-1
     )
 
-    y = Dense(hidden_layer_dim)(concatenation)
+    flat = Flatten()(concatenation)
 
-    flat = Flatten()(y)
+    y = Dense(hidden_layer_dim)(flat)
 
-    classifier = Dense(2, activation='softmax')(flat)
+    classifier = Dense(2, activation='softmax')(y)
 
     inputs = [amount_paid, order_date]
 
