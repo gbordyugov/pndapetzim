@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
 
-def build_amount_date_model(seq_len, hidden_layer_dim):
+def build_amount_date_model(seq_len, hidden_layer_dim=10):
     na = tf.newaxis
 
     amount_paid = Input(shape=(seq_len,), dtype=tf.float32, name='amount_paid')
@@ -15,7 +15,9 @@ def build_amount_date_model(seq_len, hidden_layer_dim):
         [amount_paid[:, :, na], order_date[:, :, na]], axis=-1
     )
 
-    flat = Flatten()(concatenation)
+    y = Dense(hidden_layer_dim)(concatenation)
+
+    flat = Flatten()(y)
 
     classifier = Dense(2, activation='softmax')(flat)
 
