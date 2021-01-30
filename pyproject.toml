@@ -4,9 +4,21 @@ version = "0.1.0"
 description = ""
 authors = ["Grigory Bordyugov <gregbg@gmail.com>"]
 
+[tool.black]
+line-length = 80
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+force_single_line = true
+line_length = 80
+
 [tool.poetry.dependencies]
 python = "^3.7.1"
 pandas = "^1.2.1"
+jupyterlab = "^3.0.6"
+flake8 = "^3.8.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
