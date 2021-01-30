@@ -13,6 +13,7 @@ def test_integer_encoding():
     got = IntegerEncoding.fromValues(values)
 
     assert got == expected
+    assert got.vocab_size == 5
 
 
 def test_encode_int_column():

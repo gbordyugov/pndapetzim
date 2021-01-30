@@ -23,6 +23,10 @@ class IntegerEncoding(BaseModel):
     ix_to_value: Dict[int, int]
     value_to_ix: Dict[int, int]
 
+    @property
+    def vocab_size(self):
+        return len(self.ix_to_value) + 1
+
     @staticmethod
     def fromValues(values: Iterable[int], start_value=1) -> IntegerEncoding:
         """Construct an IntegerEncoding from an iterable of values."""
