@@ -71,7 +71,7 @@ def test_encode_df():
             value_to_ix={11: 1, 12: 2, 13: 3},
             ix_to_value={1: 11, 2: 12, 3: 13},
         ),
-        'a': IntegerEncoding(
+        'c': IntegerEncoding(
             value_to_ix={21: 1, 22: 2, 23: 3},
             ix_to_value={1: 21, 2: 22, 3: 23},
         ),
@@ -79,6 +79,7 @@ def test_encode_df():
 
     got_df, got_encodings = encode_df(df, columns)
 
+    assert got_encodings == expected_encodings
     assert set(got_df.columns) == set(expected_df.columns)
 
     for c in ['a', 'b', 'c']:
