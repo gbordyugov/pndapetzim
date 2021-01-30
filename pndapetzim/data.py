@@ -2,6 +2,7 @@ from __future__ import annotations  # to allow circular type annotations
 
 from typing import Dict
 from typing import Iterable
+from typing import List
 from typing import Tuple
 
 from pandas import read_csv
@@ -39,6 +40,15 @@ class IntegerEncoding(BaseModel):
             ix_to_value=ix_to_value,
             value_to_ix=value_to_ix,
         )
+
+
+CATEGORICAL_COLUMNS = [
+    'restaurant_id',
+    'city_id',
+    'payment_id',
+    'platform_id',
+    'transmission_id',
+]
 
 
 FROM_DATE = to_datetime('2015-03-01')
@@ -125,11 +135,31 @@ def encode_int_column(
     """
 
     column = df[column_name]
-
     values = sorted(column.unique())
-
     encoding = IntegerEncoding.fromValues(values)
 
     df[column_name] = df[column_name].map(lambda v: encoding.value_to_ix[v])
 
     return df, encoding
+
+
+def encode_df(df: DataFrame, columns: List[str]) -> Tuple[DataFrame, dict]:
+    """Encode the columns with categorical features in a dataframe
+    using the function encode_int_column() above.
+
+    Arguments:
+      df: Dataframe to encode.
+      columns: list of strings, columns to encode.
+
+    Return:
+      A tuple consisting of a copy of the original dataframe plus a
+      dictionary mapping the names of the encoded columns to the
+      corresponding IntegerEncoding.
+    """
+    encodings = {}
+
+    for c in columns:
+        df, encoding = encode_int_column(df, c)
+        encodings[c] = encoding
+
+    return df, encodings
