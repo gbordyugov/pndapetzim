@@ -46,7 +46,6 @@ def test_encode_int_column():
         assert all(got_df[c] == expected_df[c])
 
 
-
 def test_encode_df():
     df = DataFrame(
         {
