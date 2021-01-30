@@ -106,7 +106,9 @@ def get_labeled_data(
     )
 
 
-def encode_int_column(df: DataFrame, column_name: str) -> Tuple[DataFrame, IntegerEncoding]:
+def encode_int_column(
+    df: DataFrame, column_name: str
+) -> Tuple[DataFrame, IntegerEncoding]:
     """Encode integer-valued column of data frame by replacing its
     values by their encodings. The zero value in encoding is reserved
     as a special padding value."""
