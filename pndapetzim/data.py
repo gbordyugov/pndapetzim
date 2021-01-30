@@ -150,7 +150,7 @@ def encode_int_column(
     return df, encoding
 
 
-def encode_df(df: DataFrame, columns: List[str]) -> Tuple[DataFrame, dict]:
+def encode_df(df: DataFrame, columns: List[str] = CATEGORICAL_COLUMNS) -> Tuple[DataFrame, dict]:
     """Encode the columns with categorical features in a dataframe
     using the function encode_int_column() above.
 
@@ -184,6 +184,11 @@ def pad_left(seq: Iterable, target_seq_len: int, padding_element=0):
     return [padding_element] * pad_len + seq
 
 
+def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
+    """Return (date-t1)/(t2-t1) as float."""
+    return (date - t1).total_seconds() / (t2 - t1).total_seconds()
+
+
 def get_dataset_from_df(
     df: DataFrame, encodings: Dict[str, IntegerEncoding], seq_len: int
 ) -> Dataset:
@@ -199,8 +204,33 @@ def get_dataset_from_df(
     """
 
     customer_id_key = 'customer_id'
+    order_date_key = 'order_date'
+    amount_paid_key = 'amount_paid'
+    label_key = 'is_returning_customer'
+
     groups = df.groupby(customer_id_key)
 
-    for customer_id, group in groups:
-        pass
-    pass
+    def generator():
+        for customer_id, group in groups:
+            group = group.sort_values(by=order_date_key)
+
+            amounts = list(group[amount_paid_key])
+            dates = [normalise_date(d) for d in group[order_date_key]]
+
+            amounts = pad_left(amounts, seq_len)
+            dates = pad_left(dates, seq_len)
+
+            label = max(group[label_key])
+            yield (amounts, dates), int(label)
+
+    signature = (
+        (
+            tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+        ),
+        tf.TensorSpec(shape=(), dtype=tf.int32),
+    )
+
+    return Dataset.from_generator(
+        generator, output_signature=signature
+    )
