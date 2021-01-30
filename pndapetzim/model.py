@@ -18,12 +18,10 @@ def build_amount_date_model(seq_len, hidden_layer_dim):
 
     flat = Flatten()(concatenation)
 
-    classifier = Dense(1, activation='sigmoid')(flat)
-
-    flattened_classifier = tf.reduce_sum(classifier, axis=1)
+    classifier = Dense(2, activation='softmax')(flat)
 
     inputs = [amount_paid, order_date]
 
-    outputs = flattened_classifier
+    outputs = classifier
 
     return Model(inputs=inputs, outputs=outputs)

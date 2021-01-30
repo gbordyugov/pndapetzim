@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+from tensorflow.data import Dataset
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.optimizers import Adam
 from pndapetzim.model import build_amount_date_model
 
 
@@ -12,9 +15,37 @@ def test_amount_date_model_shape():
 
     model = build_amount_date_model(seq_len, 10)
 
-    # output = model({'amount_paid': amount_paid, 'order_date': order_date})
-    output = model((amount_paid, order_date))
+    output = model({'amount_paid': amount_paid, 'order_date': order_date})
 
-    expected_shape = (batch_size,)
+    expected_shape = (batch_size, 2)
 
     assert output.shape == expected_shape
+
+
+def test_amount_date_model_fit():
+    seq_len = 10
+    batch_size = 32
+    train_size = 320
+
+    amount_paid = Dataset.from_tensor_slices(
+        tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
+    )
+    order_date = Dataset.from_tensor_slices(
+        tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
+    )
+    labels = Dataset.from_tensor_slices(
+        tf.random.uniform(shape=(batch_size,), maxval=2, dtype=tf.int32)
+    )
+
+    ds = Dataset.zip(
+        ((amount_paid, order_date), labels)
+    ).batch(batch_size)
+
+    model = build_amount_date_model(seq_len, 10)
+
+    loss = SparseCategoricalCrossentropy()
+    optimiser = Adam()
+
+    model.compile(loss=loss, optimizer=optimiser)
+
+    model.fit(ds)
