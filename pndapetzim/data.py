@@ -6,7 +6,6 @@ from typing import List
 from typing import Tuple
 
 import tensorflow as tf
-
 from pandas import DataFrame
 from pandas import read_csv
 from pandas import to_datetime

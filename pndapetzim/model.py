@@ -1,5 +1,4 @@
 import tensorflow as tf
-
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Input

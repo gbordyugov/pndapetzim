@@ -4,7 +4,6 @@ from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
 from pndapetzim.data import pad_left
-from pndapetzim.data import get_dataset_from_df
 
 
 def test_integer_encoding():
@@ -91,7 +90,6 @@ def test_encode_df():
 
 def test_pad_left():
     target_seq_len = 5
-    padding_element = 0
 
     inputs_and_ouputs = [
         ([], [0, 0, 0, 0, 0]),

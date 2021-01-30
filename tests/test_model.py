@@ -1,8 +1,8 @@
 import tensorflow as tf
-
 from tensorflow.data import Dataset
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
+
 from pndapetzim.model import build_amount_date_model
 
 
@@ -10,8 +10,12 @@ def test_amount_date_model_shape():
     seq_len = 10
     batch_size = 32
 
-    amount_paid = tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
-    order_date = tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
+    amount_paid = tf.random.uniform(
+        shape=(batch_size, seq_len), dtype=tf.float32
+    )
+    order_date = tf.random.uniform(
+        shape=(batch_size, seq_len), dtype=tf.float32
+    )
 
     model = build_amount_date_model(seq_len, 10)
 
@@ -28,18 +32,16 @@ def test_amount_date_model_fit():
     train_size = 320
 
     amount_paid = Dataset.from_tensor_slices(
-        tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
+        tf.random.uniform(shape=(train_size, seq_len), dtype=tf.float32)
     )
     order_date = Dataset.from_tensor_slices(
-        tf.random.uniform(shape=(batch_size, seq_len), dtype=tf.float32)
+        tf.random.uniform(shape=(train_size, seq_len), dtype=tf.float32)
     )
     labels = Dataset.from_tensor_slices(
-        tf.random.uniform(shape=(batch_size,), maxval=2, dtype=tf.int32)
+        tf.random.uniform(shape=(train_size,), maxval=2, dtype=tf.int32)
     )
 
-    ds = Dataset.zip(
-        ((amount_paid, order_date), labels)
-    ).batch(batch_size)
+    ds = Dataset.zip(((amount_paid, order_date), labels)).batch(batch_size)
 
     model = build_amount_date_model(seq_len, 10)
 
