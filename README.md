@@ -17,10 +17,14 @@ which will automagically creates a dedicated Python [virtual
 environment](https://docs.python.org/3/tutorial/venv.html). In this
 environment, `poetry` will install all dependencies of the project.
 
-In this environment, you can run any command using `poetry run`: for
-example, running `pytest` with
+In order to use this environment, you can run any command using
+`poetry run`: for example, running `pytest` with
 ```
 poetry run pytest
 ```
-would automatically execute it in this Python environment without
-messing with your current Python installation.
+would automatically execute it in the project environment without
+messing with your current Python installation. Please note that you
+don't need to activate and deactivate this environment yourself,
+`poetry` will handle it under the hood upon executing `poetry run`
+command. The path to the environment is the first line of the output
+of `poetry show -v`.
