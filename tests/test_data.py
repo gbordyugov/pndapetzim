@@ -40,9 +40,11 @@ def test_encode_int_column():
     got_df, got_encoding = encode_int_column(df, 'int_column')
 
     assert got_encoding == expected_encoding
-    assert all(got_df['int_column'] == expected_df['int_column'])
     assert set(got_df.columns) == expected_columns
-    assert all(got_df['float_column'] == expected_df['float_column'])
+
+    for c in ['int_column', 'float_column']:
+        assert all(got_df[c] == expected_df[c])
+
 
 
 def test_encode_df():
