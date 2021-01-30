@@ -5,10 +5,13 @@ from typing import Iterable
 from typing import List
 from typing import Tuple
 
+import tensorflow as tf
+
 from pandas import DataFrame
 from pandas import read_csv
 from pandas import to_datetime
 from pydantic import BaseModel
+from tensorflow.data import Dataset
 
 
 class IntegerEncoding(BaseModel):
@@ -167,3 +170,37 @@ def encode_df(df: DataFrame, columns: List[str]) -> Tuple[DataFrame, dict]:
         encodings[c] = encoding
 
     return df, encodings
+
+
+def pad_left(seq: Iterable, target_seq_len: int, padding_element=0):
+    """Pad sequence with padding_elements on the left to
+    target_seq_len."""
+
+    seq = list(seq)
+    seq = seq[-target_seq_len:]
+
+    pad_len = target_seq_len - len(seq)
+
+    return [padding_element] * pad_len + seq
+
+
+def get_dataset_from_df(
+    df: DataFrame, encodings: Dict[str, IntegerEncoding], seq_len: int
+) -> Dataset:
+    """Generate training dataset from dataframe df.
+
+    Arguments:
+      df: Dataframe with encoded categorical features by encode_df() above.
+      encodings: dict of IntegerEncodings, indexed by feature names.
+      seq_len: length of sequence.
+
+    Returns:
+      A tf.data.Dataset
+    """
+
+    customer_id_key = 'customer_id'
+    groups = df.groupby(customer_id_key)
+
+    for customer_id, group in groups:
+        pass
+    pass

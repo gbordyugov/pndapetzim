@@ -3,6 +3,8 @@ from pandas import DataFrame
 from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
+from pndapetzim.data import pad_left
+from pndapetzim.data import get_dataset_from_df
 
 
 def test_integer_encoding():
@@ -85,3 +87,22 @@ def test_encode_df():
 
     for c in ['a', 'b', 'c']:
         assert all(got_df[c] == expected_df[c])
+
+
+def test_pad_left():
+    target_seq_len = 5
+    padding_element = 0
+
+    inputs_and_ouputs = [
+        ([], [0, 0, 0, 0, 0]),
+        ([1], [0, 0, 0, 0, 1]),
+        ([1, 2], [0, 0, 0, 1, 2]),
+        ([1, 2, 3], [0, 0, 1, 2, 3]),
+        ([1, 2, 3, 4], [0, 1, 2, 3, 4]),
+        ([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]),
+        ([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6]),
+    ]
+
+    for input, expected in inputs_and_ouputs:
+        got = pad_left(input, target_seq_len)
+        assert got == expected
