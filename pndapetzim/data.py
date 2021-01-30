@@ -111,5 +111,25 @@ def encode_int_column(
 ) -> Tuple[DataFrame, IntegerEncoding]:
     """Encode integer-valued column of data frame by replacing its
     values by their encodings. The zero value in encoding is reserved
-    as a special padding value."""
-    pass
+    as a special padding value.
+
+    Arguments:
+      df: A dataframe containing column with `column_name` with
+        integer values.
+      column_name: name of the column to encode.
+
+    Return:
+      Tuple, consisting of the updated dataframe where numerical
+      values in the desired column were replaced by their indices of
+      the encoding, and a corresponding IntegerEncoding instance.
+    """
+
+    column = df[column_name]
+
+    values = sorted(column.unique())
+
+    encoding = IntegerEncoding.fromValues(values)
+
+    df[column_name] = df[column_name].map(lambda v: encoding.value_to_ix[v])
+
+    return df, encoding
