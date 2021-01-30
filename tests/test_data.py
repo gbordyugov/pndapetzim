@@ -1,7 +1,8 @@
 from pandas import DataFrame
+
+from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
-from pndapetzim.data import IntegerEncoding
 
 
 def test_integer_encoding():

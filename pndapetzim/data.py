@@ -5,9 +5,9 @@ from typing import Iterable
 from typing import List
 from typing import Tuple
 
+from pandas import DataFrame
 from pandas import read_csv
 from pandas import to_datetime
-from pandas import DataFrame
 from pydantic import BaseModel
 
 
