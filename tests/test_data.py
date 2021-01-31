@@ -141,13 +141,37 @@ def test_get_dataset_from_df():
     ds = get_dataset_from_df(df, encodings, seq_len, from_ts, to_ts)
 
     expected_first = {
-        'amount_paid': tf.constant([0.0, 0.0, 10.0, 20.0, 30.0], dtype=tf.float32),
+        'action_mask': tf.constant(
+            [
+                0,
+                0,
+                1,
+                1,
+                1,
+            ],
+            dtype=tf.float32,
+        ),
+        'amount_paid': tf.constant(
+            [0.0, 0.0, 10.0, 20.0, 30.0], dtype=tf.float32
+        ),
         'order_date': tf.constant([0.0, 0.0, 0.0, 0.5, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
     }
 
     expected_second = {
-        'amount_paid': tf.constant([0.0, 0.0, 0.0, 40.0, 50.0], dtype=tf.float32),
+        'action_mask': tf.constant(
+            [
+                0,
+                0,
+                0,
+                1,
+                1,
+            ],
+            dtype=tf.float32,
+        ),
+        'amount_paid': tf.constant(
+            [0.0, 0.0, 0.0, 40.0, 50.0], dtype=tf.float32
+        ),
         'order_date': tf.constant([0.0, 0.0, 0.0, 0.0, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
     }
@@ -156,6 +180,7 @@ def test_get_dataset_from_df():
         input = got[0]
         label = got[1]
 
+        tf.debugging.assert_equal(input['action_mask'], expected['action_mask'])
         tf.debugging.assert_equal(input['amount_paid'], expected['amount_paid'])
         tf.debugging.assert_equal(input['order_date'], expected['order_date'])
         tf.debugging.assert_equal(label, expected['is_returning_customer'])

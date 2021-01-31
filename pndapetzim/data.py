@@ -198,8 +198,8 @@ def get_dataset_from_df(
     df: DataFrame,
     encodings: Dict[str, IntegerEncoding],
     seq_len: int,
-    from_ts = FROM_DATE,
-    to_ts = TO_DATE,
+    from_ts=FROM_DATE,
+    to_ts=TO_DATE,
 ) -> Dataset:
     """Generate training dataset from dataframe df.
 
@@ -212,6 +212,7 @@ def get_dataset_from_df(
       A tf.data.Dataset
     """
 
+    action_mask_key = 'action_mask'
     customer_id_key = 'customer_id'
     order_date_key = 'order_date'
     amount_paid_key = 'amount_paid'
@@ -223,6 +224,7 @@ def get_dataset_from_df(
 
     def generator():
         for customer_id, group in groups:
+            num_actions = len(group)
             group = group.sort_values(by=order_date_key)
 
             amounts = group[amount_paid_key]
@@ -233,10 +235,13 @@ def get_dataset_from_df(
             amounts = padder(amounts)
             dates = padder(dates)
 
+            action_mask = padder([1] * num_actions)
+
             label = group[label_key].max()
 
             yield (
                 {
+                    action_mask_key: action_mask,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
@@ -245,6 +250,7 @@ def get_dataset_from_df(
 
     signature = (
         {
+            action_mask_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },
