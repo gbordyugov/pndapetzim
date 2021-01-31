@@ -269,7 +269,7 @@ def load_dataset(
     order_path: str = 'data/' + ORDER_FILE_NAME,
     label_path: str = 'data/' + LABEL_FILE_NAME,
     seq_len: int = 10,
-    returning_weight = 1.0,
+    returning_weight=1.0,
 ) -> Dataset:
 
     df = get_labeled_data(order_path, label_path)

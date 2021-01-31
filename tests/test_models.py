@@ -3,7 +3,7 @@ from tensorflow.data import Dataset
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.optimizers import Adam
 
-from pndapetzim.model import build_amount_date_model
+from pndapetzim.models import build_amount_date_model
 
 
 def test_amount_date_model_shape():
