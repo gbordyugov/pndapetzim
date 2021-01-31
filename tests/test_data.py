@@ -3,7 +3,7 @@ from pandas import DataFrame
 from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
-from pndapetzim.data import pad_left
+from pndapetzim.data import make_left_padder
 
 
 def test_integer_encoding():
@@ -88,7 +88,7 @@ def test_encode_df():
         assert all(got_df[c] == expected_df[c])
 
 
-def test_pad_left():
+def test_make_left_padder():
     target_seq_len = 5
 
     inputs_and_ouputs = [
@@ -101,6 +101,8 @@ def test_pad_left():
         ([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6]),
     ]
 
+    padder = make_left_padder(target_seq_len)
+
     for input, expected in inputs_and_ouputs:
-        got = pad_left(input, target_seq_len)
+        got = padder(input)
         assert got == expected

@@ -173,17 +173,20 @@ def encode_df(
     return df, encodings
 
 
-def pad_left(seq: Iterable, target_seq_len: int, padding_element=0):
-    """Pad sequence with padding_elements on the left to
-    target_seq_len."""
+def make_left_padder(target_seq_len: int, padding_element=0):
+    """Return a callable that pads sequence with padding_elements on
+    the left to target_seq_len."""
 
-    seq = list(seq)
-    seq = seq[-target_seq_len:]
+    padding = [padding_element] * target_seq_len
 
-    pad_len = target_seq_len - len(seq)
+    def padder(seq):
+        seq = list(seq)
+        seq = seq[-target_seq_len:]
+        pad_len = target_seq_len - len(seq)
 
-    return [padding_element] * pad_len + seq
+        return padding[:pad_len] + seq
 
+    return padder
 
 def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
     """Return (date-t1)/(t2-t1) as float."""
@@ -209,19 +212,21 @@ def get_dataset_from_df(
     amount_paid_key = 'amount_paid'
     label_key = 'is_returning_customer'
 
+    padder = make_left_padder(seq_len)
+
     groups = df.groupby(customer_id_key)
 
     def generator():
         for customer_id, group in groups:
             group = group.sort_values(by=order_date_key)
 
-            amounts = list(group[amount_paid_key])
+            amounts = group[amount_paid_key]
             dates = [normalise_date(d) for d in group[order_date_key]]
 
-            amounts = pad_left(amounts, seq_len)
-            dates = pad_left(dates, seq_len)
+            amounts = padder(amounts)
+            dates = padder(dates)
 
-            label = max(group[label_key])
+            label = group[label_key].max()
 
             yield (
                 {
