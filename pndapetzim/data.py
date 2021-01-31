@@ -268,9 +268,10 @@ def get_dataset_from_df(
 def load_dataset(
     order_path: str = 'data/' + ORDER_FILE_NAME,
     label_path: str = 'data/' + LABEL_FILE_NAME,
-    seq_len: int = 50,
+    seq_len: int = 10,
+    returning_weight = 1.0,
 ) -> Dataset:
 
     df = get_labeled_data(order_path, label_path)
     df, encodings = encode_df(df)
-    return get_dataset_from_df(df, seq_len)
+    return get_dataset_from_df(df, seq_len, returning_weight)
