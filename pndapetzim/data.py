@@ -188,13 +188,18 @@ def make_left_padder(target_seq_len: int, padding_element=0):
 
     return padder
 
+
 def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
     """Return (date-t1)/(t2-t1) as float."""
     return (date - t1).total_seconds() / (t2 - t1).total_seconds()
 
 
 def get_dataset_from_df(
-    df: DataFrame, encodings: Dict[str, IntegerEncoding], seq_len: int
+    df: DataFrame,
+    encodings: Dict[str, IntegerEncoding],
+    seq_len: int,
+    from_ts = FROM_DATE,
+    to_ts = TO_DATE,
 ) -> Dataset:
     """Generate training dataset from dataframe df.
 
@@ -221,7 +226,9 @@ def get_dataset_from_df(
             group = group.sort_values(by=order_date_key)
 
             amounts = group[amount_paid_key]
-            dates = [normalise_date(d) for d in group[order_date_key]]
+            dates = [
+                normalise_date(d, from_ts, to_ts) for d in group[order_date_key]
+            ]
 
             amounts = padder(amounts)
             dates = padder(dates)

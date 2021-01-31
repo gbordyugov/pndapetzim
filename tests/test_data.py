@@ -1,8 +1,12 @@
 from pandas import DataFrame
+from pandas import to_datetime
+
+import tensorflow as tf
 
 from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
+from pndapetzim.data import get_dataset_from_df
 from pndapetzim.data import make_left_padder
 
 
@@ -106,3 +110,52 @@ def test_make_left_padder():
     for input, expected in inputs_and_ouputs:
         got = padder(input)
         assert got == expected
+
+
+def test_get_dataset_from_df():
+    seq_len = 5
+
+    from_ts = to_datetime('2020-01-10')
+    to_ts = to_datetime('2020-01-20')
+
+    df = DataFrame(
+        {
+            'customer_id': [1, 1, 1, 2, 2],
+            'order_date': [
+                '2020-01-10',
+                '2020-01-15',
+                '2020-01-20',
+                '2020-01-10',
+                '2020-01-20',
+            ],
+            'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
+            'is_returning_customer': [1, 1, 1, 0, 0],
+        }
+    )
+
+    dates_lut = {d: to_datetime(d) for d in df.order_date.unique()}
+    df.order_date = df.order_date.apply(lambda d: dates_lut[d])
+
+    encodings = {}
+
+    ds = get_dataset_from_df(df, encodings, seq_len, from_ts, to_ts)
+
+    expected_first = {
+        'amount_paid': tf.constant([0.0, 0.0, 10.0, 20.0, 30.0], dtype=tf.float32),
+        'order_date': tf.constant([0.0, 0.0, 0.0, 0.5, 1.0], dtype=tf.float32),
+        'is_returning_customer': tf.constant(1, dtype=tf.int32),
+    }
+
+    expected_second = {
+        'amount_paid': tf.constant([0.0, 0.0, 0.0, 40.0, 50.0], dtype=tf.float32),
+        'order_date': tf.constant([0.0, 0.0, 0.0, 0.0, 1.0], dtype=tf.float32),
+        'is_returning_customer': tf.constant(0, dtype=tf.int32),
+    }
+
+    for got, expected in zip(ds, [expected_first, expected_second]):
+        input = got[0]
+        label = got[1]
+
+        tf.debugging.assert_equal(input['amount_paid'], expected['amount_paid'])
+        tf.debugging.assert_equal(input['order_date'], expected['order_date'])
+        tf.debugging.assert_equal(label, expected['is_returning_customer'])
