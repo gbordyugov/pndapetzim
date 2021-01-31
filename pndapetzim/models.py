@@ -6,20 +6,20 @@ from tensorflow.keras.models import Model
 
 
 def build_amount_date_model(seq_len, hidden_layer_dim=10):
-    na = tf.newaxis
-
     action_mask = Input(shape=(seq_len,), dtype=tf.float32, name='action_mask')
     amount_paid = Input(shape=(seq_len,), dtype=tf.float32, name='amount_paid')
     order_date = Input(shape=(seq_len,), dtype=tf.float32, name='order_date')
 
+    na = tf.newaxis
     concatenation = tf.concat(
         [action_mask[:, :, na], amount_paid[:, :, na], order_date[:, :, na]],
         axis=-1,
     )
 
-    flat = Flatten()(concatenation)
+    y = Flatten()(concatenation)
 
-    y = Dense(hidden_layer_dim)(flat)
+    if hidden_layer_dim > 1:
+        y = Dense(hidden_layer_dim, activation='tanh')(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
