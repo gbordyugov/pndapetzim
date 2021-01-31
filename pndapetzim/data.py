@@ -197,6 +197,7 @@ def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
 def get_dataset_from_df(
     df: DataFrame,
     seq_len: int,
+    returning_weight: float = 1.0,
     from_ts=FROM_DATE,
     to_ts=TO_DATE,
 ) -> Dataset:
@@ -204,8 +205,10 @@ def get_dataset_from_df(
 
     Arguments:
       df: Dataframe with encoded categorical features by encode_df() above.
-      encodings: dict of IntegerEncodings, indexed by feature names.
       seq_len: length of sequence.
+      returning_weight: sample weight for returning customers, used
+        for over- undersampling with values larger or smaller than 1.0.
+      from_ts, to_ds: are timestamps used to normalise order dates.
 
     Returns:
       A tf.data.Dataset
@@ -236,15 +239,17 @@ def get_dataset_from_df(
 
             action_mask = padder([1] * num_actions)
 
-            label = group[label_key].max()
+            label = int(group[label_key].max())
 
+            weight = returning_weight if label > 0 else 1.0
             yield (
                 {
                     action_mask_key: action_mask,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
-                [int(label)],
+                [label],
+                weight
             )
 
     signature = (
@@ -254,6 +259,7 @@ def get_dataset_from_df(
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },
         tf.TensorSpec(shape=(1,), dtype=tf.int32),
+        tf.TensorSpec(shape=(), dtype=tf.float32),
     )
 
     return Dataset.from_generator(generator, output_signature=signature)

@@ -52,11 +52,14 @@ def test_amount_date_model_fit():
     label = Dataset.from_tensor_slices(
         tf.random.uniform(shape=(train_size, 1), maxval=2, dtype=tf.int32)
     )
+    weight = Dataset.from_tensor_slices(
+        tf.random.uniform(shape=(train_size,), dtype=tf.float32)
+    )
 
     input = action_mask, amount_paid, order_date
-    ds = Dataset.zip((input, label))
+    ds = Dataset.zip((input, label, weight))
 
-    def make_dict(input, label):
+    def make_dict(input, label, weight):
         action_mask, amount_paid, order_date = input
         return (
             {
@@ -65,6 +68,7 @@ def test_amount_date_model_fit():
                 'order_date': order_date,
             },
             label,
+            weight
         )
 
     ds = ds.map(make_dict)

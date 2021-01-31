@@ -117,6 +117,8 @@ def test_get_dataset_from_df():
     from_ts = to_datetime('2020-01-10')
     to_ts = to_datetime('2020-01-20')
 
+    returning_weight = 3.0
+
     df = DataFrame(
         {
             'customer_id': [1, 1, 1, 2, 2],
@@ -135,7 +137,7 @@ def test_get_dataset_from_df():
     dates_lut = {d: to_datetime(d) for d in df.order_date.unique()}
     df.order_date = df.order_date.apply(lambda d: dates_lut[d])
 
-    ds = get_dataset_from_df(df, seq_len, from_ts, to_ts)
+    ds = get_dataset_from_df(df, seq_len, returning_weight, from_ts, to_ts)
 
     expected_first = {
         'action_mask': tf.constant(
@@ -153,6 +155,7 @@ def test_get_dataset_from_df():
         ),
         'order_date': tf.constant([0.0, 0.0, 0.0, 0.5, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
+        'weight': returning_weight,
     }
 
     expected_second = {
@@ -171,13 +174,16 @@ def test_get_dataset_from_df():
         ),
         'order_date': tf.constant([0.0, 0.0, 0.0, 0.0, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
+        'weight': 1.0,
     }
 
     for got, expected in zip(ds, [expected_first, expected_second]):
         input = got[0]
         label = got[1]
+        weight = got[2]
 
         tf.debugging.assert_equal(input['action_mask'], expected['action_mask'])
         tf.debugging.assert_equal(input['amount_paid'], expected['amount_paid'])
         tf.debugging.assert_equal(input['order_date'], expected['order_date'])
         tf.debugging.assert_equal(label, expected['is_returning_customer'])
+        tf.debugging.assert_equal(weight, expected['weight'])
