@@ -249,7 +249,7 @@ def get_dataset_from_df(
                     order_date_key: dates,
                 },
                 [label],
-                weight
+                weight,
             )
 
     signature = (

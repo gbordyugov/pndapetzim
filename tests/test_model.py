@@ -68,7 +68,7 @@ def test_amount_date_model_fit():
                 'order_date': order_date,
             },
             label,
-            weight
+            weight,
         )
 
     ds = ds.map(make_dict)
