@@ -53,10 +53,11 @@ def test_amount_date_model_fit():
         tf.random.uniform(shape=(train_size,), maxval=2, dtype=tf.int32)
     )
 
-    ds = Dataset.zip(((action_mask, amount_paid, order_date), label))
+    input = action_mask, amount_paid, order_date
+    ds = Dataset.zip((input, label))
 
-    def make_dict(x):
-        (action_mask, amount_paid, order_date), label = x
+    def make_dict(input, label):
+        action_mask, amount_paid, order_date = input
         return (
             {
                 'action_mask': action_mask,
@@ -66,7 +67,7 @@ def test_amount_date_model_fit():
             label,
         )
 
-    # ds = ds.map(make_dict)
+    ds = ds.map(make_dict)
     ds = ds.batch(batch_size)
 
 
