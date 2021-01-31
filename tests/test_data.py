@@ -136,9 +136,7 @@ def test_get_dataset_from_df():
     dates_lut = {d: to_datetime(d) for d in df.order_date.unique()}
     df.order_date = df.order_date.apply(lambda d: dates_lut[d])
 
-    encodings = {}
-
-    ds = get_dataset_from_df(df, encodings, seq_len, from_ts, to_ts)
+    ds = get_dataset_from_df(df, seq_len, from_ts, to_ts)
 
     expected_first = {
         'action_mask': tf.constant(

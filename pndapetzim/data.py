@@ -196,7 +196,6 @@ def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
 
 def get_dataset_from_df(
     df: DataFrame,
-    encodings: Dict[str, IntegerEncoding],
     seq_len: int,
     from_ts=FROM_DATE,
     to_ts=TO_DATE,
