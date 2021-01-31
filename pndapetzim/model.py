@@ -21,7 +21,7 @@ def build_amount_date_model(seq_len, hidden_layer_dim=10):
 
     y = Dense(hidden_layer_dim)(flat)
 
-    classifier = Dense(2, activation='softmax')(y)
+    classifier = Dense(1, activation='sigmoid')(y)
 
     inputs = [action_mask, amount_paid, order_date]
 

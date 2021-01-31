@@ -244,7 +244,7 @@ def get_dataset_from_df(
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
-                int(label),
+                [int(label)],
             )
 
     signature = (
@@ -253,7 +253,18 @@ def get_dataset_from_df(
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },
-        tf.TensorSpec(shape=(), dtype=tf.int32),
+        tf.TensorSpec(shape=(1,), dtype=tf.int32),
     )
 
     return Dataset.from_generator(generator, output_signature=signature)
+
+
+def load_dataset(
+    order_path: str = 'data/' + ORDER_FILE_NAME,
+    label_path: str = 'data/' + LABEL_FILE_NAME,
+    seq_len: int = 50,
+) -> Dataset:
+
+    df = get_labeled_data(order_path, label_path)
+    df, encodings = encode_df(df)
+    return get_dataset_from_df(df, seq_len)

@@ -1,7 +1,6 @@
+import tensorflow as tf
 from pandas import DataFrame
 from pandas import to_datetime
-
-import tensorflow as tf
 
 from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
