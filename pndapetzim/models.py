@@ -11,15 +11,13 @@ def build_amount_date_model(seq_len, hidden_layer_dim=10):
     order_date = Input(shape=(seq_len,), dtype=tf.float32, name='order_date')
 
     na = tf.newaxis
-    concatenation = tf.concat(
+    y = tf.concat(
         [action_mask[:, :, na], amount_paid[:, :, na], order_date[:, :, na]],
         axis=-1,
     )
 
-    y = Flatten()(concatenation)
-
-    if hidden_layer_dim > 1:
-        y = Dense(hidden_layer_dim, activation='tanh')(y)
+    y = Dense(hidden_layer_dim)(y)
+    y = Flatten()(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
