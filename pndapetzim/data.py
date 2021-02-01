@@ -189,6 +189,12 @@ def make_left_padder(target_seq_len: int, padding_element=0):
     return padder
 
 
+def normalise_dates(dates, t1=FROM_DATE, t2=TO_DATE):
+    delta = t2 - t1
+    deltas = dates - t1
+    return deltas/delta
+
+
 def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
     """Return (date-t1)/(t2-t1) as float."""
     return (date - t1).total_seconds() / (t2 - t1).total_seconds()

@@ -7,6 +7,7 @@ from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
 from pndapetzim.data import get_dataset_from_df
 from pndapetzim.data import make_left_padder
+from pndapetzim.data import normalise_dates
 
 
 def test_integer_encoding():
@@ -187,3 +188,26 @@ def test_get_dataset_from_df():
         tf.debugging.assert_equal(input['order_date'], expected['order_date'])
         tf.debugging.assert_equal(label, expected['is_returning_customer'])
         tf.debugging.assert_equal(weight, expected['weight'])
+
+
+def test_normalise_dates():
+    from_date = to_datetime('2020-01-01')
+    to_date = to_datetime('2020-01-05')
+
+    df = DataFrame(
+        {
+            'timestamp': [
+                to_datetime('2020-01-01'),
+                to_datetime('2020-01-02'),
+                to_datetime('2020-01-03'),
+                to_datetime('2020-01-04'),
+                to_datetime('2020-01-05'),
+            ],
+        }
+    )
+
+    got = normalise_dates(df.timestamp, from_date, to_date)
+
+    expected = [0.0, 0.25, 0.5, 0.75, 1.0]
+
+    assert list(got) == expected
