@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from pandas import DataFrame
 from pandas import to_datetime
@@ -6,8 +7,8 @@ from pndapetzim.data import IntegerEncoding
 from pndapetzim.data import encode_df
 from pndapetzim.data import encode_int_column
 from pndapetzim.data import get_dataset_from_df
-from pndapetzim.data import make_left_padder
 from pndapetzim.data import normalise_dates
+from pndapetzim.data import pad_left
 
 
 def test_integer_encoding():
@@ -92,7 +93,7 @@ def test_encode_df():
         assert all(got_df[c] == expected_df[c])
 
 
-def test_make_left_padder():
+def test_pad_left():
     target_seq_len = 5
 
     inputs_and_ouputs = [
@@ -105,11 +106,9 @@ def test_make_left_padder():
         ([1, 2, 3, 4, 5, 6], [2, 3, 4, 5, 6]),
     ]
 
-    padder = make_left_padder(target_seq_len)
-
     for input, expected in inputs_and_ouputs:
-        got = padder(input)
-        assert got == expected
+        got = pad_left(np.array(input), target_seq_len)
+        assert all(got == expected)
 
 
 def test_get_dataset_from_df():
@@ -124,19 +123,16 @@ def test_get_dataset_from_df():
         {
             'customer_id': [1, 1, 1, 2, 2],
             'order_date': [
-                '2020-01-10',
-                '2020-01-15',
-                '2020-01-20',
-                '2020-01-10',
-                '2020-01-20',
+                to_datetime('2020-01-10'),
+                to_datetime('2020-01-15'),
+                to_datetime('2020-01-20'),
+                to_datetime('2020-01-10'),
+                to_datetime('2020-01-20'),
             ],
             'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
             'is_returning_customer': [1, 1, 1, 0, 0],
         }
     )
-
-    dates_lut = {d: to_datetime(d) for d in df.order_date.unique()}
-    df.order_date = df.order_date.apply(lambda d: dates_lut[d])
 
     ds = get_dataset_from_df(df, seq_len, returning_weight, from_ts, to_ts)
 

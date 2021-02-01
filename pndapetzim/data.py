@@ -5,6 +5,7 @@ from typing import Iterable
 from typing import List
 from typing import Tuple
 
+import numpy as np
 import tensorflow as tf
 from pandas import DataFrame
 from pandas import read_csv
@@ -173,31 +174,25 @@ def encode_df(
     return df, encodings
 
 
-def make_left_padder(target_seq_len: int, padding_element=0):
-    """Return a callable that pads sequence with padding_elements on
-    the left to target_seq_len."""
+def pad_left(array, target_seq_len, padding_element=0):
+    padding = np.repeat(padding_element, target_seq_len).astype(array.dtype)
 
-    padding = [padding_element] * target_seq_len
+    if len(array) < 1:
+        return padding
 
-    def padder(seq):
-        seq = list(seq)
-        seq = seq[-target_seq_len:]
-        pad_len = target_seq_len - len(seq)
+    array = array[-target_seq_len:]
+    padding[-len(array):] = array
 
-        return padding[:pad_len] + seq
-
-    return padder
+    return padding
 
 
 def normalise_dates(dates, t1=FROM_DATE, t2=TO_DATE):
+    """Normalise dates to the interval (t1, t2)."""
+
     delta = t2 - t1
     deltas = dates - t1
-    return deltas/delta
 
-
-def normalise_date(date, t1=FROM_DATE, t2=TO_DATE):
-    """Return (date-t1)/(t2-t1) as float."""
-    return (date - t1).total_seconds() / (t2 - t1).total_seconds()
+    return deltas / delta
 
 
 def get_dataset_from_df(
@@ -226,8 +221,6 @@ def get_dataset_from_df(
     amount_paid_key = 'amount_paid'
     label_key = 'is_returning_customer'
 
-    padder = make_left_padder(seq_len)
-
     groups = df.groupby(customer_id_key, sort=False)
 
     def generator():
@@ -236,14 +229,11 @@ def get_dataset_from_df(
             # group = group.sort_values(by=order_date_key)
 
             amounts = group[amount_paid_key]
-            dates = [
-                normalise_date(d, from_ts, to_ts) for d in group[order_date_key]
-            ]
+            dates = normalise_dates(group[order_date_key], from_ts, to_ts)
 
-            amounts = padder(amounts)
-            dates = padder(dates)
-
-            action_mask = padder([1] * num_actions)
+            amounts = pad_left(amounts, seq_len)
+            dates = pad_left(dates, seq_len)
+            action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
             label = int(group[label_key].max())
 
