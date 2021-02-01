@@ -275,7 +275,7 @@ def load_datasets(
 
     df = get_labeled_data(order_path, label_path)
     df, encodings = encode_df(df)
-    ds = get_dataset_from_df(df, seq_len, returning_weight)
+    ds = get_dataset_from_df(df, seq_len, returning_weight).cache()
 
     train = ds.window(train_ratio, train_ratio + 1).flat_map(
         lambda *ds: tf.data.Dataset.zip(ds)
@@ -284,6 +284,6 @@ def load_datasets(
         ds.skip(train_ratio)
         .window(1, train_ratio + 1)
         .flat_map(lambda *ds: tf.data.Dataset.zip(ds))
-    )
+    ).shuffle(100)
 
     return train, test
