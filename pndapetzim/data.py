@@ -181,7 +181,7 @@ def pad_left(array, target_seq_len, padding_element=0):
         return padding
 
     array = array[-target_seq_len:]
-    padding[-len(array):] = array
+    padding[-len(array) :] = array
 
     return padding
 
@@ -219,7 +219,6 @@ def get_dataset_from_df(
     customer_id_key = 'customer_id'
     order_date_key = 'order_date'
     amount_paid_key = 'amount_paid'
-    label_key = 'is_returning_customer'
 
     groups = df.groupby(customer_id_key, sort=False)
 
@@ -228,14 +227,14 @@ def get_dataset_from_df(
             num_actions = len(group)
             # group = group.sort_values(by=order_date_key)
 
-            amounts = group[amount_paid_key]
-            dates = normalise_dates(group[order_date_key], from_ts, to_ts)
+            amounts = group.amount_paid
+            dates = normalise_dates(group.order_date, from_ts, to_ts)
 
             amounts = pad_left(amounts, seq_len)
             dates = pad_left(dates, seq_len)
             action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
-            label = int(group[label_key].max())
+            label = int(group.is_returning_customer.max())
 
             weight = returning_weight if label > 0 else 1.0
             yield (
