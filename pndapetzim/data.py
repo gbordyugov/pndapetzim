@@ -265,13 +265,25 @@ def get_dataset_from_df(
     return Dataset.from_generator(generator, output_signature=signature)
 
 
-def load_dataset(
+def load_datasets(
     order_path: str = 'data/' + ORDER_FILE_NAME,
     label_path: str = 'data/' + LABEL_FILE_NAME,
     seq_len: int = 10,
-    returning_weight=1.0,
-) -> Dataset:
+    train_ratio: int = 100,
+    returning_weight: float = 1.0,
+) -> Tuple[Dataset, Dataset]:
 
     df = get_labeled_data(order_path, label_path)
     df, encodings = encode_df(df)
-    return get_dataset_from_df(df, seq_len, returning_weight)
+    ds = get_dataset_from_df(df, seq_len, returning_weight)
+
+    train = ds.window(train_ratio, train_ratio + 1).flat_map(
+        lambda *ds: tf.data.Dataset.zip(ds)
+    )
+    test = (
+        ds.skip(train_ratio)
+        .window(1, train_ratio + 1)
+        .flat_map(lambda *ds: tf.data.Dataset.zip(ds))
+    )
+
+    return train, test
