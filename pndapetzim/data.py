@@ -222,12 +222,12 @@ def get_dataset_from_df(
 
     padder = make_left_padder(seq_len)
 
-    groups = df.groupby(customer_id_key)
+    groups = df.groupby(customer_id_key, sort=False)
 
     def generator():
         for customer_id, group in groups:
             num_actions = len(group)
-            group = group.sort_values(by=order_date_key)
+            # group = group.sort_values(by=order_date_key)
 
             amounts = group[amount_paid_key]
             dates = [
