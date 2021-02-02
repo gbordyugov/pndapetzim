@@ -223,7 +223,7 @@ def get_dataset_from_df(
     order_hour_cos_key = 'order_hour_sin'
     is_failed_key = 'is_failed'
     voucher_amount_key = 'voucher_amount'
-    delivery_fee = 'delivery_fee'
+    delivery_fee_key = 'delivery_fee'
     amount_paid_key = 'amount_paid'
     restaurant_id_key = 'restaurant_id_key'
     city_id_key = 'city_id'
@@ -238,6 +238,9 @@ def get_dataset_from_df(
             num_actions = len(group)
             # group = group.sort_values(by=order_date_key)
 
+            dates = normalise_dates(group.order_date, from_ts, to_ts)
+            dates = pad_left(dates, seq_len, -100.0)
+
             two_pi = 2.0 * np.pi
             order_hour_cos = pad_left(
                 np.cos(group.order_hour * two_pi / 24.0), seq_len
@@ -249,12 +252,10 @@ def get_dataset_from_df(
             is_failed = pad_left(group.is_failed, seq_len, 0.0)
 
             voucher_amount = pad_left(group.voucher_amount, seq_len, -1.0)
+            delivery_fee = pad_left(group.delivery_fee, seq_len, -1.0)
 
-            amounts = group.amount_paid
-            dates = normalise_dates(group.order_date, from_ts, to_ts)
+            amounts = pad_left(group.amount_paid, seq_len, -1.0)
 
-            amounts = pad_left(amounts, seq_len)
-            dates = pad_left(dates, seq_len, -100.0)
             action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
             label = int(group.is_returning_customer.max())
@@ -267,6 +268,7 @@ def get_dataset_from_df(
                     order_hour_sin_key: order_hour_sin,
                     is_failed_key: is_failed,
                     voucher_amount_key: voucher_amount,
+                    delivery_fee_key: delivery_fee,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
@@ -285,6 +287,7 @@ def get_dataset_from_df(
             ),
             is_failed_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             voucher_amount_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            delivery_fee_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },
