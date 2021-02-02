@@ -239,8 +239,14 @@ def get_dataset_from_df(
             # group = group.sort_values(by=order_date_key)
 
             two_pi = 2.0 * np.pi
-            order_hour_cos = pad_left(np.cos(group.order_hour * two_pi / 24.0), seq_len, -10.0)
-            order_hour_sin = pad_left(np.cos(group.order_hour * two_pi / 24.0), seq_len, -10.0)
+            order_hour_cos = pad_left(
+                np.cos(group.order_hour * two_pi / 24.0), seq_len
+            )
+            order_hour_sin = pad_left(
+                np.cos(group.order_hour * two_pi / 24.0), seq_len
+            )
+
+            is_failed = pad_left(group.is_failed, seq_len, 0.0)
 
             amounts = group.amount_paid
             dates = normalise_dates(group.order_date, from_ts, to_ts)
@@ -257,6 +263,7 @@ def get_dataset_from_df(
                     action_mask_key: action_mask,
                     order_hour_cos_key: order_hour_cos,
                     order_hour_sin_key: order_hour_sin,
+                    is_failed_key: is_failed,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
@@ -267,10 +274,13 @@ def get_dataset_from_df(
     signature = (
         {
             action_mask_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-
-            order_hour_cos_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-            order_hour_sin_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-
+            order_hour_cos_key: tf.TensorSpec(
+                shape=(seq_len,), dtype=tf.float32
+            ),
+            order_hour_sin_key: tf.TensorSpec(
+                shape=(seq_len,), dtype=tf.float32
+            ),
+            is_failed_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },

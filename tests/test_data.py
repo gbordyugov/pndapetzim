@@ -129,7 +129,8 @@ def test_get_dataset_from_df():
                 to_datetime('2020-01-10'),
                 to_datetime('2020-01-20'),
             ],
-            'order_hour': [6.0, 6.0, 6.0, 18.0, 18.0],
+            'order_hour': [6.0, 6.0, 6.0, 0.0, 0.0],
+            'is_failed': [0, 0, 0, 0, 0],
             'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
             'is_returning_customer': [1, 1, 1, 0, 0],
         }
@@ -151,7 +152,16 @@ def test_get_dataset_from_df():
         'amount_paid': tf.constant(
             [0.0, 0.0, 10.0, 20.0, 30.0], dtype=tf.float32
         ),
-        'order_date': tf.constant([-100.0, -100.0, 0.0, 0.5, 1.0], dtype=tf.float32),
+        'order_date': tf.constant(
+            [-100.0, -100.0, 0.0, 0.5, 1.0], dtype=tf.float32
+        ),
+        'order_hour_cos': tf.constant(
+            [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
+        ),
+        'order_hour_sin': tf.constant(
+            [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
+        ),
+        'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
         'weight': returning_weight,
     }
@@ -170,7 +180,16 @@ def test_get_dataset_from_df():
         'amount_paid': tf.constant(
             [0.0, 0.0, 0.0, 40.0, 50.0], dtype=tf.float32
         ),
-        'order_date': tf.constant([-100.0, -100.0, -100.0, 0.0, 1.0], dtype=tf.float32),
+        'order_date': tf.constant(
+            [-100.0, -100.0, -100.0, 0.0, 1.0], dtype=tf.float32
+        ),
+        'order_hour_cos': tf.constant(
+            [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
+        ),
+        'order_hour_sin': tf.constant(
+            [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
+        ),
+        'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
         'weight': 1.0,
     }
@@ -180,9 +199,19 @@ def test_get_dataset_from_df():
         label = got[1]
         weight = got[2]
 
-        tf.debugging.assert_equal(input['action_mask'], expected['action_mask'])
-        tf.debugging.assert_equal(input['amount_paid'], expected['amount_paid'])
-        tf.debugging.assert_equal(input['order_date'], expected['order_date'])
+        keys = [
+            'action_mask',
+            'amount_paid',
+            'order_date',
+            # Those are difficult to compare due to the numerical precision.
+            # 'order_hour_cos',
+            # 'order_hour_sin',
+            'is_failed',
+        ]
+
+        for k in keys:
+            tf.debugging.assert_equal(input[k], expected[k])
+
         tf.debugging.assert_equal(label, expected['is_returning_customer'])
         tf.debugging.assert_equal(weight, expected['weight'])
 
