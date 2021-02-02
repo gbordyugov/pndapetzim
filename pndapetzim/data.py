@@ -248,6 +248,8 @@ def get_dataset_from_df(
 
             is_failed = pad_left(group.is_failed, seq_len, 0.0)
 
+            voucher_amount = pad_left(group.voucher_amount, seq_len, -1.0)
+
             amounts = group.amount_paid
             dates = normalise_dates(group.order_date, from_ts, to_ts)
 
@@ -264,6 +266,7 @@ def get_dataset_from_df(
                     order_hour_cos_key: order_hour_cos,
                     order_hour_sin_key: order_hour_sin,
                     is_failed_key: is_failed,
+                    voucher_amount_key: voucher_amount,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
@@ -281,6 +284,7 @@ def get_dataset_from_df(
                 shape=(seq_len,), dtype=tf.float32
             ),
             is_failed_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            voucher_amount_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },

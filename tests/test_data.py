@@ -132,6 +132,7 @@ def test_get_dataset_from_df():
             'order_hour': [6.0, 6.0, 6.0, 0.0, 0.0],
             'is_failed': [0, 0, 0, 0, 0],
             'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
+            'voucher_amount': [1, 2, 3, 4, 5],
             'is_returning_customer': [1, 1, 1, 0, 0],
         }
     )
@@ -162,6 +163,7 @@ def test_get_dataset_from_df():
             [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
         ),
         'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
+        'voucher_amount': tf.constant([-1.0, -1.0, 1, 2, 3], dtype=tf.float32),
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
         'weight': returning_weight,
     }
@@ -190,6 +192,7 @@ def test_get_dataset_from_df():
             [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
         ),
         'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
+        'voucher_amount': tf.constant([-1.0, -1.0, -1.0, 4, 5], dtype=tf.float32),
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
         'weight': 1.0,
     }
@@ -207,6 +210,7 @@ def test_get_dataset_from_df():
             # 'order_hour_cos',
             # 'order_hour_sin',
             'is_failed',
+            'voucher_amount',
         ]
 
         for k in keys:
