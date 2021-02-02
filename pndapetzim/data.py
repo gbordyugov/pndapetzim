@@ -235,7 +235,7 @@ def get_dataset_from_df(
             action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
             dates = normalise_dates(group.order_date, from_ts, to_ts)
-            dates = pad_left(dates, seq_len, -10.0)
+            dates = pad_left(dates, seq_len, -1.0)
 
             two_pi = 2.0 * np.pi
             order_hour_cos = pad_left(

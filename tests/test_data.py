@@ -158,7 +158,7 @@ def test_get_dataset_from_df():
             dtype=tf.float32,
         ),
         'order_date': tf.constant(
-            [-10.0, -10.0, 0.0, 0.5, 1.0], dtype=tf.float32
+            [-1.0, -1.0, 0.0, 0.5, 1.0], dtype=tf.float32
         ),
         'order_hour_cos': tf.constant(
             [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
@@ -195,7 +195,7 @@ def test_get_dataset_from_df():
             dtype=tf.float32,
         ),
         'order_date': tf.constant(
-            [-10.0, -10.0, -10.0, 0.0, 1.0], dtype=tf.float32
+            [-1.0, -1.0, -1.0, 0.0, 1.0], dtype=tf.float32
         ),
         'order_hour_cos': tf.constant(
             [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
