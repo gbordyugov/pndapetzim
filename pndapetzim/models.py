@@ -45,43 +45,55 @@ def build_large_model(
 
     action_mask = Input(shape=(seq_len,), dtype=tf.float32, name='action_mask')
     order_date = Input(shape=(seq_len,), dtype=tf.float32, name='order_date')
-    order_hour_cos = Input(shape=(seq_len,), dtype=tf.float32, name='order_hour_cos')
-    order_hour_sin = Input(shape=(seq_len,), dtype=tf.float32, name='order_hour_sin')
+    order_hour_cos = Input(
+        shape=(seq_len,), dtype=tf.float32, name='order_hour_cos'
+    )
+    order_hour_sin = Input(
+        shape=(seq_len,), dtype=tf.float32, name='order_hour_sin'
+    )
     is_failed = Input(shape=(seq_len,), dtype=tf.float32, name='is_failed')
-    voucher_amount = Input(shape=(seq_len,), dtype=tf.float32, name='voucher_amount')
-    delivery_fee = Input(shape=(seq_len,), dtype=tf.float32, name='delivery_fee')
+    voucher_amount = Input(
+        shape=(seq_len,), dtype=tf.float32, name='voucher_amount'
+    )
+    delivery_fee = Input(
+        shape=(seq_len,), dtype=tf.float32, name='delivery_fee'
+    )
     amount_paid = Input(shape=(seq_len,), dtype=tf.float32, name='amount_paid')
 
     # Categorical features.
-    restaurant_id = Input(shape=(seq_len,), dtype=tf.int32, name='restaurant_id')
+    restaurant_id = Input(
+        shape=(seq_len,), dtype=tf.int32, name='restaurant_id'
+    )
     city_id = Input(shape=(seq_len,), dtype=tf.int32, name='city_id')
     payment_id = Input(shape=(seq_len,), dtype=tf.int32, name='payment_id')
     platform_id = Input(shape=(seq_len,), dtype=tf.int32, name='platform_id')
-    transmission_id = Input(shape=(seq_len,), dtype=tf.int32, name='transmission_id')
+    transmission_id = Input(
+        shape=(seq_len,), dtype=tf.int32, name='transmission_id'
+    )
 
     restaurant = Embedding(
         input_dim=cat_features['restaurant_id'].vocab_size,
-        output_dim=cat_features['restaurant_id'] .embedding_size,
+        output_dim=cat_features['restaurant_id'].embedding_size,
     )(restaurant_id)
 
     city = Embedding(
         input_dim=cat_features['city_id'].vocab_size,
-        output_dim=cat_features['city_id'] .embedding_size,
+        output_dim=cat_features['city_id'].embedding_size,
     )(city_id)
 
     payment = Embedding(
         input_dim=cat_features['payment_id'].vocab_size,
-        output_dim=cat_features['payment_id'] .embedding_size,
+        output_dim=cat_features['payment_id'].embedding_size,
     )(payment_id)
 
     platform = Embedding(
         input_dim=cat_features['platform_id'].vocab_size,
-        output_dim=cat_features['platform_id'] .embedding_size,
+        output_dim=cat_features['platform_id'].embedding_size,
     )(platform_id)
 
     transmission = Embedding(
         input_dim=cat_features['transmission_id'].vocab_size,
-        output_dim=cat_features['transmission_id'] .embedding_size,
+        output_dim=cat_features['transmission_id'].embedding_size,
     )(transmission_id)
 
     y = tf.concat(
@@ -94,7 +106,6 @@ def build_large_model(
             voucher_amount[:, :, na],
             delivery_fee[:, :, na],
             amount_paid[:, :, na],
-
             # Categorical features.
             restaurant,
             city,
@@ -105,12 +116,12 @@ def build_large_model(
         axis=-1,
     )
 
-    y = Dense(30, activation='tanh')(y)
-    y = Dense(30, activation='tanh')(y)
+    y = Dense(30, activation='relu')(y)
+    y = Dense(30, activation='relu')(y)
 
     y = Flatten()(y)
-    y = Dense(200, activation='tanh')(y)
-    y = Dense(200, activation='tanh')(y)
+    y = Dense(500, activation='relu')(y)
+    y = Dense(200, activation='relu')(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
@@ -123,7 +134,6 @@ def build_large_model(
         voucher_amount,
         delivery_fee,
         amount_paid,
-
         # Categorical features.
         restaurant_id,
         city_id,

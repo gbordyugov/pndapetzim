@@ -176,16 +176,9 @@ def encode_df(
 
 
 def pad_left(array, target_seq_len, padding_element=0):
-    padding = np.repeat(padding_element, target_seq_len).astype(array.dtype)
-
-    if len(array) < 1:
-        return padding
-
     array = array[-target_seq_len:]
-    padding[-len(array) :] = array
-
-    return padding
-
+    padding = np.repeat(padding_element, target_seq_len - len(array))
+    return np.concatenate((padding, array))
 
 def normalise_dates(dates, t1=FROM_DATE, t2=TO_DATE):
     """Normalise dates to the interval (t1, t2)."""
@@ -278,7 +271,6 @@ def get_dataset_from_df(
                     voucher_amount_key: voucher_amount,
                     delivery_fee_key: delivery_fee,
                     amount_paid_key: amount_paid,
-
                     # Categorical features.
                     restaurant_id_key: restaurant_id,
                     city_id_key: city_id,
@@ -306,7 +298,6 @@ def get_dataset_from_df(
             ),
             delivery_fee_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-
             # Categorical features.
             restaurant_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
             city_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
