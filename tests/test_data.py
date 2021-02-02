@@ -131,9 +131,15 @@ def test_get_dataset_from_df():
             ],
             'order_hour': [6.0, 6.0, 6.0, 0.0, 0.0],
             'is_failed': [0, 0, 0, 0, 0],
-            'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
             'voucher_amount': [1, 2, 3, 4, 5],
             'delivery_fee': [5, 4, 3, 2, 1],
+            'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
+            'restaurant_id': [1, 2, 3, 4, 5],
+            'city_id': [1, 2, 3, 4, 5],
+            'payment_id': [1, 2, 3, 4, 5],
+            'platform_id': [1, 2, 3, 4, 5],
+            'transmission_id': [1, 2, 3, 4, 5],
+            # Label.
             'is_returning_customer': [1, 1, 1, 0, 0],
         }
     )
@@ -151,9 +157,6 @@ def test_get_dataset_from_df():
             ],
             dtype=tf.float32,
         ),
-        'amount_paid': tf.constant(
-            [-1.0, -1.0, 10.0, 20.0, 30.0], dtype=tf.float32
-        ),
         'order_date': tf.constant(
             [-100.0, -100.0, 0.0, 0.5, 1.0], dtype=tf.float32
         ),
@@ -166,6 +169,16 @@ def test_get_dataset_from_df():
         'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
         'voucher_amount': tf.constant([-1.0, -1.0, 1, 2, 3], dtype=tf.float32),
         'delivery_fee': tf.constant([-1.0, -1.0, 5, 4, 3], dtype=tf.float32),
+        'amount_paid': tf.constant(
+            [-1.0, -1.0, 10.0, 20.0, 30.0], dtype=tf.float32
+        ),
+        # Categorical features.
+        'restaurant_id': tf.constant([0, 0, 1, 2, 3], dtype=tf.int32),
+        'city_id': tf.constant([0, 0, 1, 2, 3], dtype=tf.int32),
+        'payment_id': tf.constant([0, 0, 1, 2, 3], dtype=tf.int32),
+        'platform_id': tf.constant([0, 0, 1, 2, 3], dtype=tf.int32),
+        'transmission_id': tf.constant([0, 0, 1, 2, 3], dtype=tf.int32),
+        # Label.
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
         'weight': returning_weight,
     }
@@ -181,9 +194,6 @@ def test_get_dataset_from_df():
             ],
             dtype=tf.float32,
         ),
-        'amount_paid': tf.constant(
-            [-1.0, -1.0, -1.0, 40.0, 50.0], dtype=tf.float32
-        ),
         'order_date': tf.constant(
             [-100.0, -100.0, -100.0, 0.0, 1.0], dtype=tf.float32
         ),
@@ -194,8 +204,20 @@ def test_get_dataset_from_df():
             [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
         ),
         'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
-        'voucher_amount': tf.constant([-1.0, -1.0, -1.0, 4, 5], dtype=tf.float32),
+        'voucher_amount': tf.constant(
+            [-1.0, -1.0, -1.0, 4, 5], dtype=tf.float32
+        ),
         'delivery_fee': tf.constant([-1.0, -1.0, -1.0, 2, 1], dtype=tf.float32),
+        'amount_paid': tf.constant(
+            [-1.0, -1.0, -1.0, 40.0, 50.0], dtype=tf.float32
+        ),
+        # Categorical features.
+        'restaurant_id': tf.constant([0, 0, 0, 4, 5], dtype=tf.int32),
+        'city_id': tf.constant([0, 0, 0, 4, 5], dtype=tf.int32),
+        'payment_id': tf.constant([0, 0, 0, 4, 5], dtype=tf.int32),
+        'platform_id': tf.constant([0, 0, 0, 4, 5], dtype=tf.int32),
+        'transmission_id': tf.constant([0, 0, 0, 4, 5], dtype=tf.int32),
+        # Label.
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
         'weight': 1.0,
     }
@@ -207,7 +229,6 @@ def test_get_dataset_from_df():
 
         keys = [
             'action_mask',
-            'amount_paid',
             'order_date',
             # Those are difficult to compare due to the numerical precision.
             # 'order_hour_cos',
@@ -215,6 +236,12 @@ def test_get_dataset_from_df():
             'is_failed',
             'voucher_amount',
             'delivery_fee',
+            'amount_paid',
+            'restaurant_id',
+            'city_id',
+            'payment_id',
+            'platform_id',
+            'transmission_id',
         ]
 
         for k in keys:

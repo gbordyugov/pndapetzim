@@ -225,7 +225,7 @@ def get_dataset_from_df(
     voucher_amount_key = 'voucher_amount'
     delivery_fee_key = 'delivery_fee'
     amount_paid_key = 'amount_paid'
-    restaurant_id_key = 'restaurant_id_key'
+    restaurant_id_key = 'restaurant_id'
     city_id_key = 'city_id'
     payment_id_key = 'payment_id'
     platform_id_key = 'platform_id'
@@ -237,6 +237,8 @@ def get_dataset_from_df(
         for customer_id, group in groups:
             num_actions = len(group)
             # group = group.sort_values(by=order_date_key)
+
+            action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
             dates = normalise_dates(group.order_date, from_ts, to_ts)
             dates = pad_left(dates, seq_len, -100.0)
@@ -254,9 +256,14 @@ def get_dataset_from_df(
             voucher_amount = pad_left(group.voucher_amount, seq_len, -1.0)
             delivery_fee = pad_left(group.delivery_fee, seq_len, -1.0)
 
-            amounts = pad_left(group.amount_paid, seq_len, -1.0)
+            amount_paid = pad_left(group.amount_paid, seq_len, -1.0)
 
-            action_mask = pad_left(np.repeat(1, num_actions), seq_len)
+            # Categorical features
+            restaurant_id = pad_left(group.restaurant_id, seq_len)
+            city_id = pad_left(group.city_id, seq_len)
+            payment_id = pad_left(group.payment_id, seq_len)
+            platform_id = pad_left(group.platform_id, seq_len)
+            transmission_id = pad_left(group.transmission_id, seq_len)
 
             label = int(group.is_returning_customer.max())
 
@@ -264,13 +271,18 @@ def get_dataset_from_df(
             yield (
                 {
                     action_mask_key: action_mask,
+                    order_date_key: dates,
                     order_hour_cos_key: order_hour_cos,
                     order_hour_sin_key: order_hour_sin,
                     is_failed_key: is_failed,
                     voucher_amount_key: voucher_amount,
                     delivery_fee_key: delivery_fee,
-                    amount_paid_key: amounts,
-                    order_date_key: dates,
+                    amount_paid_key: amount_paid,
+                    restaurant_id_key: restaurant_id,
+                    city_id_key: city_id,
+                    payment_id_key: payment_id,
+                    platform_id_key: platform_id,
+                    transmission_id_key: transmission_id,
                 },
                 [label],
                 weight,
@@ -279,6 +291,7 @@ def get_dataset_from_df(
     signature = (
         {
             action_mask_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_hour_cos_key: tf.TensorSpec(
                 shape=(seq_len,), dtype=tf.float32
             ),
@@ -286,10 +299,20 @@ def get_dataset_from_df(
                 shape=(seq_len,), dtype=tf.float32
             ),
             is_failed_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-            voucher_amount_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            voucher_amount_key: tf.TensorSpec(
+                shape=(seq_len,), dtype=tf.float32
+            ),
             delivery_fee_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
-            order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+
+            # Categorical features.
+            restaurant_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
+            city_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
+            payment_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
+            platform_id_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.int32),
+            transmission_id_key: tf.TensorSpec(
+                shape=(seq_len,), dtype=tf.int32
+            ),
         },
         tf.TensorSpec(shape=(1,), dtype=tf.int32),
         tf.TensorSpec(shape=(), dtype=tf.float32),
