@@ -116,12 +116,12 @@ def build_large_model(
         axis=-1,
     )
 
-    y = Dense(30, activation='relu')(y)
-    y = Dense(30, activation='relu')(y)
+    # y = Dense(30, activation='relu')(y)
+    # y = Dense(30, activation='relu')(y)
 
     y = Flatten()(y)
-    y = Dense(500, activation='relu')(y)
-    y = Dense(200, activation='relu')(y)
+    # y = Dense(500, activation='relu')(y)
+    # y = Dense(200, activation='relu')(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
