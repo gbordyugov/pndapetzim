@@ -108,7 +108,8 @@ def test_pad_left():
 
     for input, expected in inputs_and_ouputs:
         got = pad_left(np.array(input), target_seq_len)
-        assert all(got == expected)
+        # assert all(got == expected)
+        assert got == expected
 
 
 def test_get_dataset_from_df():

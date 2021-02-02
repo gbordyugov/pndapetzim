@@ -176,12 +176,25 @@ def encode_df(
 
 
 def pad_left(array, target_seq_len, padding_element=0):
+    array = list(array)[-target_seq_len:]
+    padding = [padding_element] * (target_seq_len - len(array))
+    return padding + array
+
+
+def pad_left_numpy(array, target_seq_len, padding_element=0):
     array = array[-target_seq_len:]
     padding = np.repeat(padding_element, target_seq_len - len(array))
     return np.concatenate((padding, array))
 
 
 def normalise_dates(dates, t1=FROM_DATE, t2=TO_DATE):
+    """Normalise dates to the interval (t1, t2)."""
+
+    delta = t2 - t1
+    return [(d - t1) / delta for d in dates]
+
+
+def normalise_dates_numpy(dates, t1=FROM_DATE, t2=TO_DATE):
     """Normalise dates to the interval (t1, t2)."""
 
     delta = t2 - t1
