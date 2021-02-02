@@ -250,13 +250,9 @@ def get_dataset_from_df(
             dates = normalise_dates(group.order_date, from_ts, to_ts)
             dates = pad_left(dates, seq_len, -10.0)
 
-            two_pi = 2.0 * np.pi
-            order_hour_cos = pad_left(
-                np.cos(group.order_hour * two_pi / 24.0), seq_len
-            )
-            order_hour_sin = pad_left(
-                np.sin(group.order_hour * two_pi / 24.0), seq_len
-            )
+            angle = group.order_hour / 24.0 * 2.0 * np.pi
+            order_hour_cos = pad_left(np.cos(angle), seq_len)
+            order_hour_sin = pad_left(np.sin(angle), seq_len)
 
             is_failed = pad_left(group.is_failed, seq_len)
 
