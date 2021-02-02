@@ -180,6 +180,7 @@ def pad_left(array, target_seq_len, padding_element=0):
     padding = np.repeat(padding_element, target_seq_len - len(array))
     return np.concatenate((padding, array))
 
+
 def normalise_dates(dates, t1=FROM_DATE, t2=TO_DATE):
     """Normalise dates to the interval (t1, t2)."""
 
@@ -212,8 +213,8 @@ def get_dataset_from_df(
     action_mask_key = 'action_mask'
     customer_id_key = 'customer_id'
     order_date_key = 'order_date'
-    order_hour_sin_key = 'order_hour_cos'
-    order_hour_cos_key = 'order_hour_sin'
+    order_hour_cos_key = 'order_hour_cos'
+    order_hour_sin_key = 'order_hour_sin'
     is_failed_key = 'is_failed'
     voucher_amount_key = 'voucher_amount'
     delivery_fee_key = 'delivery_fee'
@@ -241,10 +242,10 @@ def get_dataset_from_df(
                 np.cos(group.order_hour * two_pi / 24.0), seq_len
             )
             order_hour_sin = pad_left(
-                np.cos(group.order_hour * two_pi / 24.0), seq_len
+                np.sin(group.order_hour * two_pi / 24.0), seq_len
             )
 
-            is_failed = pad_left(group.is_failed, seq_len, 0.0)
+            is_failed = pad_left(group.is_failed, seq_len)
 
             voucher_amount = pad_left(group.voucher_amount, seq_len, -1.0)
             delivery_fee = pad_left(group.delivery_fee, seq_len, -1.0)
