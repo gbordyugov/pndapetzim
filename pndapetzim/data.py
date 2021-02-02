@@ -278,6 +278,8 @@ def get_dataset_from_df(
                     voucher_amount_key: voucher_amount,
                     delivery_fee_key: delivery_fee,
                     amount_paid_key: amount_paid,
+
+                    # Categorical features.
                     restaurant_id_key: restaurant_id,
                     city_id_key: city_id,
                     payment_id_key: payment_id,
