@@ -79,8 +79,9 @@ def read_order_table(
         return int(customer_id, 16)
 
     converters = {customer_id_key: customer_id_converter}
+    dtype = {'order_hour': float}
 
-    df = read_csv(path, converters=converters, *vargs, **kwargs)
+    df = read_csv(path, converters=converters, dtype=dtype, *vargs, **kwargs)
 
     # Convert string dates into 64bit timestamps using a look-up
     # table, which greatly accelerates the speed of the conversion.
@@ -218,7 +219,17 @@ def get_dataset_from_df(
     action_mask_key = 'action_mask'
     customer_id_key = 'customer_id'
     order_date_key = 'order_date'
+    order_hour_sin_key = 'order_hour_cos'
+    order_hour_cos_key = 'order_hour_sin'
+    is_failed_key = 'is_failed'
+    voucher_amount_key = 'voucher_amount'
+    delivery_fee = 'delivery_fee'
     amount_paid_key = 'amount_paid'
+    restaurant_id_key = 'restaurant_id_key'
+    city_id_key = 'city_id'
+    payment_id_key = 'payment_id'
+    platform_id_key = 'platform_id'
+    transmission_id_key = 'transmission_id'
 
     groups = df.groupby(customer_id_key, sort=False)
 
@@ -227,11 +238,15 @@ def get_dataset_from_df(
             num_actions = len(group)
             # group = group.sort_values(by=order_date_key)
 
+            two_pi = 2.0 * np.pi
+            order_hour_cos = pad_left(np.cos(group.order_hour * two_pi / 24.0), seq_len, -10.0)
+            order_hour_sin = pad_left(np.cos(group.order_hour * two_pi / 24.0), seq_len, -10.0)
+
             amounts = group.amount_paid
             dates = normalise_dates(group.order_date, from_ts, to_ts)
 
             amounts = pad_left(amounts, seq_len)
-            dates = pad_left(dates, seq_len)
+            dates = pad_left(dates, seq_len, -100.0)
             action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
             label = int(group.is_returning_customer.max())
@@ -240,6 +255,8 @@ def get_dataset_from_df(
             yield (
                 {
                     action_mask_key: action_mask,
+                    order_hour_cos_key: order_hour_cos,
+                    order_hour_sin_key: order_hour_sin,
                     amount_paid_key: amounts,
                     order_date_key: dates,
                 },
@@ -250,6 +267,10 @@ def get_dataset_from_df(
     signature = (
         {
             action_mask_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+
+            order_hour_cos_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+            order_hour_sin_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
+
             amount_paid_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
             order_date_key: tf.TensorSpec(shape=(seq_len,), dtype=tf.float32),
         },

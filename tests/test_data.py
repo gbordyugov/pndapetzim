@@ -129,6 +129,7 @@ def test_get_dataset_from_df():
                 to_datetime('2020-01-10'),
                 to_datetime('2020-01-20'),
             ],
+            'order_hour': [6.0, 6.0, 6.0, 18.0, 18.0],
             'amount_paid': [10.0, 20.0, 30.0, 40.0, 50.0],
             'is_returning_customer': [1, 1, 1, 0, 0],
         }
@@ -150,7 +151,7 @@ def test_get_dataset_from_df():
         'amount_paid': tf.constant(
             [0.0, 0.0, 10.0, 20.0, 30.0], dtype=tf.float32
         ),
-        'order_date': tf.constant([0.0, 0.0, 0.0, 0.5, 1.0], dtype=tf.float32),
+        'order_date': tf.constant([-100.0, -100.0, 0.0, 0.5, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(1, dtype=tf.int32),
         'weight': returning_weight,
     }
@@ -169,7 +170,7 @@ def test_get_dataset_from_df():
         'amount_paid': tf.constant(
             [0.0, 0.0, 0.0, 40.0, 50.0], dtype=tf.float32
         ),
-        'order_date': tf.constant([0.0, 0.0, 0.0, 0.0, 1.0], dtype=tf.float32),
+        'order_date': tf.constant([-100.0, -100.0, -100.0, 0.0, 1.0], dtype=tf.float32),
         'is_returning_customer': tf.constant(0, dtype=tf.int32),
         'weight': 1.0,
     }
