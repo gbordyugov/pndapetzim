@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
 
-def build_amount_date_model(seq_len, hidden_layer_dim=3):
+def build_small_model(seq_len, hidden_layer_dim=3):
     action_mask = Input(shape=(seq_len,), dtype=tf.float32, name='action_mask')
     amount_paid = Input(shape=(seq_len,), dtype=tf.float32, name='amount_paid')
     order_date = Input(shape=(seq_len,), dtype=tf.float32, name='order_date')

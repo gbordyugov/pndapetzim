@@ -3,7 +3,7 @@ from tensorflow.data import Dataset
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.optimizers import Adam
 
-from pndapetzim.models import build_amount_date_model
+from pndapetzim.models import build_small_model
 
 
 def test_amount_date_model_shape():
@@ -20,7 +20,7 @@ def test_amount_date_model_shape():
         shape=(batch_size, seq_len), dtype=tf.float32
     )
 
-    model = build_amount_date_model(seq_len, 10)
+    model = build_small_model(seq_len, 10)
 
     output = model(
         {
@@ -74,7 +74,7 @@ def test_amount_date_model_fit():
     ds = ds.map(make_dict)
     ds = ds.batch(batch_size)
 
-    model = build_amount_date_model(seq_len, 10)
+    model = build_small_model(seq_len, 10)
 
     loss = BinaryCrossentropy()
     optimiser = Adam()
