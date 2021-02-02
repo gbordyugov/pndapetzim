@@ -1,6 +1,7 @@
 from typing import Dict
 import tensorflow as tf
 from pydantic import BaseModel
+from tensorflow.keras.layers import Embedding
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Input
@@ -51,6 +52,38 @@ def build_large_model(
     delivery_fee = Input(shape=(seq_len,), dtype=tf.float32, name='delivery_fee')
     amount_paid = Input(shape=(seq_len,), dtype=tf.float32, name='amount_paid')
 
+    # Categorical features.
+    restaurant_id = Input(shape=(seq_len,), dtype=tf.int32, name='restaurant_id')
+    city_id = Input(shape=(seq_len,), dtype=tf.int32, name='city_id')
+    payment_id = Input(shape=(seq_len,), dtype=tf.int32, name='payment_id')
+    platform_id = Input(shape=(seq_len,), dtype=tf.int32, name='platform_id')
+    transmission_id = Input(shape=(seq_len,), dtype=tf.int32, name='transmission_id')
+
+    restaurant = Embedding(
+        input_dim=cat_features['restaurant_id'].vocab_size,
+        output_dim=cat_features['restaurant_id'] .embedding_size,
+    )(restaurant_id)
+
+    city = Embedding(
+        input_dim=cat_features['city_id'].vocab_size,
+        output_dim=cat_features['city_id'] .embedding_size,
+    )(city_id)
+
+    payment = Embedding(
+        input_dim=cat_features['payment_id'].vocab_size,
+        output_dim=cat_features['payment_id'] .embedding_size,
+    )(payment_id)
+
+    platform = Embedding(
+        input_dim=cat_features['platform_id'].vocab_size,
+        output_dim=cat_features['platform_id'] .embedding_size,
+    )(platform_id)
+
+    transmission = Embedding(
+        input_dim=cat_features['transmission_id'].vocab_size,
+        output_dim=cat_features['transmission_id'] .embedding_size,
+    )(transmission_id)
+
     y = tf.concat(
         [
             action_mask[:, :, na],
@@ -61,12 +94,23 @@ def build_large_model(
             voucher_amount[:, :, na],
             delivery_fee[:, :, na],
             amount_paid[:, :, na],
+
+            # Categorical features.
+            restaurant,
+            city,
+            payment,
+            platform,
+            transmission,
         ],
         axis=-1,
     )
 
+    y = Dense(30, activation='tanh')(y)
+    y = Dense(30, activation='tanh')(y)
+
     y = Flatten()(y)
-    y = Dense(100)(y)
+    y = Dense(200, activation='tanh')(y)
+    y = Dense(200, activation='tanh')(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
@@ -79,6 +123,13 @@ def build_large_model(
         voucher_amount,
         delivery_fee,
         amount_paid,
+
+        # Categorical features.
+        restaurant_id,
+        city_id,
+        payment_id,
+        platform_id,
+        transmission_id,
     ]
 
     outputs = classifier

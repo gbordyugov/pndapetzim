@@ -153,7 +153,7 @@ def encode_int_column(
 
 def encode_df(
     df: DataFrame, columns: List[str] = CATEGORICAL_COLUMNS
-) -> Tuple[DataFrame, dict]:
+) -> Tuple[DataFrame, Dict[str, IntegerEncoding]]:
     """Encode the columns with categorical features in a dataframe
     using the function encode_int_column() above.
 
@@ -329,7 +329,7 @@ def load_datasets(
     seq_len: int = 10,
     train_ratio: int = 100,
     returning_weight: float = 1.0,
-) -> Tuple[Dataset, Dataset]:
+) -> Tuple[Dataset, Dataset, Dict[str, IntegerEncoding]]:
 
     df = get_labeled_data(order_path, label_path)
     df, encodings = encode_df(df)
@@ -344,4 +344,4 @@ def load_datasets(
         .flat_map(lambda *ds: tf.data.Dataset.zip(ds))
     )
 
-    return train, test
+    return train, test, encodings
