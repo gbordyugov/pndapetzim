@@ -256,7 +256,7 @@ def get_dataset_from_df(
             num_actions = len(group)
             # group =group.sort_values(by=order_date_key)
 
-            action_mask = pad_left(np.repeat(1, num_actions), seq_len)
+            action_mask = pad_left(group.action_mask, seq_len)
 
             dates = pad_left(group.order_date, seq_len, -10.0)
 
