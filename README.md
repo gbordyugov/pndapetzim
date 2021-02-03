@@ -185,7 +185,7 @@ The most frequent restaurant ids are:
 ```
 
 The same analysis can be applied to city id, payment id, and so on by
-choosing a different field index: `-f10` would correspond to city id`,
+choosing a different field index: `-f10` would correspond to city id,
 `-f11` to payment id, etc.
 
 
