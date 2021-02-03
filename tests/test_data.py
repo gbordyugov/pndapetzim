@@ -122,6 +122,7 @@ def test_get_dataset_from_df():
 
     df = DataFrame(
         {
+            'action_mask': [1, 1, 1, 1, 1],
             'customer_id': [1, 1, 1, 2, 2],
             'order_date': [0, 0.25, 0.5, 0.75, 1.0],
             'order_hour': [6.0, 6.0, 6.0, 0.0, 0.0],

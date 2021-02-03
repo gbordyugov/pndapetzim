@@ -92,7 +92,9 @@ def read_order_table(
     df[order_date_key] = df[order_date_key].apply(lambda d: dates_lut[d])
 
     df[action_mask_key] = np.ones(len(df))
-    df[order_date_key] = (df.order_date.to_numpy() - FROM_DATE) / (TO_DATE - FROM_DATE)
+    df[order_date_key] = (df.order_date.to_numpy() - FROM_DATE) / (
+        TO_DATE - FROM_DATE
+    )
 
     angle = df.order_hour.to_numpy() / 24.0 * 2.0 * np.pi
     df[order_hour_cos_key] = np.cos(angle)
@@ -253,9 +255,6 @@ def get_dataset_from_df(
 
     def generator():
         for customer_id, group in groups:
-            num_actions = len(group)
-            # group =group.sort_values(by=order_date_key)
-
             action_mask = pad_left(group.action_mask, seq_len)
 
             dates = pad_left(group.order_date, seq_len, -10.0)

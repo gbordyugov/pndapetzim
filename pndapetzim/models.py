@@ -1,10 +1,11 @@
 from typing import Dict
+
 import tensorflow as tf
 from pydantic import BaseModel
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Embedding
+from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
