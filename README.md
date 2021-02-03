@@ -57,7 +57,7 @@ for sorting the import order.
 
 ## Main findings
 
-I build two neural networks to classify customers into returning and
+I built two neural networks to classify customers into returning and
 non-returnin ones. The results of their training are presented in the
 table below.
 
@@ -70,18 +70,19 @@ table below.
 Those reported metrics were calculated on the test data, i.e.
 customers that were not part of the training data. Those results
 suggest that it would be worth it investing more time in building a
-better model as a straigh-forward feature expansion didn't bring a lot
-of improvement.
+better model as a straight-forward feature addition and model blow-up
+didn't bring a lot of improvement.
 
 
 ### The small model
 
-The small model accepts a sequence of 20 latest customer orders
-(missing orders in short histories are padded with zeros to the length
-of 20), and for each order the considers only the date of order and
-the order amount. It has a couple of intermediate dense layers, and
-the output layer has a single output with a sigmoid activation
-function.
+The [small
+model](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/models.py#L18)
+accepts a sequence of 20 latest customer orders (missing orders in
+short histories are padded with zeros to the length of 20), and for
+each order the considers only the date of order and the order amount.
+It has a couple of intermediate dense layers, and the output layer has
+a single output with a sigmoid activation function.
 
 The date of order is normalised in such a way that the timestamps of
 `2015-03-01` and `2017-02-28` correspond to the normalised values of 0
@@ -90,12 +91,13 @@ and 1, respectively.
 
 ### The big model
 
-The big model also accepts a sequence of 20 latest customer orders,
-but it takes into account all available features of the orders. The
-categorical features (restaurant id, city id, etc.) are encoded using
-embedding layers. After that, all features for every order are
-contatenated into a single vector, and the sequence of those vectors
-are connected to an
+The [big
+model](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/models.py#L43)
+also accepts a sequence of 20 latest customer orders, but it takes
+into account all available features of the orders. The categorical
+features (restaurant id, city id, etc.) are encoded using embedding
+layers. After that, all features for every order are contatenated into
+a single vector, and the sequence of those vectors are connected to an
 [LSTM](https://en.wikipedia.org/wiki/Long_short-term_memory)-like
 architecture. The output of the bigger model is again a single-headed
 sigmoid-activation unit.
