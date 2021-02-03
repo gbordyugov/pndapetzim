@@ -87,6 +87,7 @@ The date of order is normalised in such a way that the timestamps of
 `2015-03-01` and `2017-02-28` correspond to the normalised values of 0
 and 1, respectively.
 
+
 ### The big model
 
 The big model also accepts a sequence of 20 latest customer orders,
@@ -105,12 +106,14 @@ coordintes in order to account for the circular nature of hours, see,
 for instance,
 [here](https://en.wikipedia.org/wiki/Mean_of_circular_quantities).
 
+
 ### Oversampling the positive training samples
 
 As returning customers represent approx 20% of the total number of
 customers, I prescribed a relative weight of 5 to training samples
 with returning customers. This resulted in a significantly better
 values of the recall metric.
+
 
 ### Train/test data split
 
@@ -186,7 +189,8 @@ choosing a different field index: `-f10` would correspond to city id`,
 `-f11` to payment id, etc.
 
 
-## Data transformation before training.
+## Data transformation before training
+
 
 ### Optimising data types
 
@@ -201,6 +205,7 @@ I
 [mapped](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L97)
 string order dates to float64 timestamps for a smaller memory
 footprint of the dataframe.
+
 
 ### Getting labelled training data
 
