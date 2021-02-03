@@ -58,8 +58,8 @@ CATEGORICAL_COLUMNS = [
 ]
 
 
-FROM_DATE = to_datetime('2015-03-01')
-TO_DATE = to_datetime('2017-02-28')
+FROM_DATE = np.datetime64('2015-03-01')
+TO_DATE = np.datetime64('2017-02-28')
 
 ORDER_FILE_NAME = 'machine_learning_challenge_order_data.csv.gz'
 LABEL_FILE_NAME = 'machine_learning_challenge_labeled_data.csv.gz'
@@ -71,8 +71,11 @@ def read_order_table(
     """Read order table, parsing customer ids as hexadecimal integers
     and turning order dates into 64bit timestamps."""
 
+    action_mask_key = 'action_mask'
     customer_id_key = 'customer_id'
     order_date_key = 'order_date'
+    order_hour_cos_key = 'order_hour_cos'
+    order_hour_sin_key = 'order_hour_sin'
 
     # Parse customer id as a hexadecimal int.
     def customer_id_converter(customer_id):
@@ -88,6 +91,14 @@ def read_order_table(
     dates_lut = {d: to_datetime(d) for d in df[order_date_key].unique()}
     df[order_date_key] = df[order_date_key].apply(lambda d: dates_lut[d])
 
+    df[action_mask_key] = np.ones(len(df))
+    df[order_date_key] = (df.order_date.to_numpy() - FROM_DATE) / (TO_DATE - FROM_DATE)
+
+    angle = df.order_hour.to_numpy() / 24.0 * 2.0 * np.pi
+    df[order_hour_cos_key] = np.cos(angle)
+    df[order_hour_sin_key] = np.sin(angle)
+
+    df.reset_index(inplace=True)
     return df
 
 
@@ -176,7 +187,7 @@ def encode_df(
 
 
 def pad_left(array, target_seq_len, padding_element=0):
-    array = list(array)[-target_seq_len:]
+    array = list(array[-target_seq_len:])
     padding = [padding_element] * (target_seq_len - len(array))
     return padding + array
 
@@ -243,16 +254,14 @@ def get_dataset_from_df(
     def generator():
         for customer_id, group in groups:
             num_actions = len(group)
-            # group = group.sort_values(by=order_date_key)
+            # group =group.sort_values(by=order_date_key)
 
             action_mask = pad_left(np.repeat(1, num_actions), seq_len)
 
-            dates = normalise_dates(group.order_date, from_ts, to_ts)
-            dates = pad_left(dates, seq_len, -10.0)
+            dates = pad_left(group.order_date, seq_len, -10.0)
 
-            angle = group.order_hour / 24.0 * 2.0 * np.pi
-            order_hour_cos = pad_left(np.cos(angle), seq_len)
-            order_hour_sin = pad_left(np.sin(angle), seq_len)
+            order_hour_cos = pad_left(group.order_hour_cos, seq_len)
+            order_hour_sin = pad_left(group.order_hour_sin, seq_len)
 
             is_failed = pad_left(group.is_failed, seq_len)
 

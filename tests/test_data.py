@@ -123,14 +123,10 @@ def test_get_dataset_from_df():
     df = DataFrame(
         {
             'customer_id': [1, 1, 1, 2, 2],
-            'order_date': [
-                to_datetime('2020-01-10'),
-                to_datetime('2020-01-15'),
-                to_datetime('2020-01-20'),
-                to_datetime('2020-01-10'),
-                to_datetime('2020-01-20'),
-            ],
+            'order_date': [0, 0.25, 0.5, 0.75, 1.0],
             'order_hour': [6.0, 6.0, 6.0, 0.0, 0.0],
+            'order_hour_cos': [0.0, 0.0, 0.0, 1.0, 1.0],
+            'order_hour_sin': [1.0, 1.0, 1.0, 0.0, 0.0],
             'is_failed': [0, 0, 0, 0, 0],
             'voucher_amount': [1, 2, 3, 4, 5],
             'delivery_fee': [5, 4, 3, 2, 1],
@@ -159,13 +155,13 @@ def test_get_dataset_from_df():
             dtype=tf.float32,
         ),
         'order_date': tf.constant(
-            [-10.0, -10.0, 0.0, 0.5, 1.0], dtype=tf.float32
+            [-10.0, -10.0, 0.0, 0.25, 0.5], dtype=tf.float32
         ),
         'order_hour_cos': tf.constant(
             [0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32
         ),
         'order_hour_sin': tf.constant(
-            [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
+            [0.0, 0.0, 1.0, 1.0, 1.0], dtype=tf.float32
         ),
         'is_failed': tf.constant([0.0, 0.0, 0.0, 0.0, 0.0], dtype=tf.float32),
         'voucher_amount': tf.constant([-1.0, -1.0, 1, 2, 3], dtype=tf.float32),
@@ -196,7 +192,7 @@ def test_get_dataset_from_df():
             dtype=tf.float32,
         ),
         'order_date': tf.constant(
-            [-10.0, -10.0, -10.0, 0.0, 1.0], dtype=tf.float32
+            [-10.0, -10.0, -10.0, 0.75, 1.0], dtype=tf.float32
         ),
         'order_hour_cos': tf.constant(
             [0.0, 0.0, 0.0, 1.0, 1.0], dtype=tf.float32
@@ -231,9 +227,6 @@ def test_get_dataset_from_df():
         keys = [
             'action_mask',
             'order_date',
-            # Those are difficult to compare due to the numerical precision.
-            # 'order_hour_cos',
-            # 'order_hour_sin',
             'is_failed',
             'voucher_amount',
             'delivery_fee',
@@ -243,9 +236,14 @@ def test_get_dataset_from_df():
             'payment_id',
             'platform_id',
             'transmission_id',
+            # Those are difficult to compare due to the numerical precision.
+            'order_hour_cos',
+            'order_hour_sin',
         ]
 
         for k in keys:
+            print('got:', input[k])
+            print('expected:', expected[k])
             tf.debugging.assert_equal(input[k], expected[k])
 
         tf.debugging.assert_equal(label, expected['is_returning_customer'])
