@@ -189,6 +189,23 @@ choosing a different field index: `-f10` would correspond to city id,
 `-f11` to payment id, etc.
 
 
+Let us finally double-check that no customer is labelled twice:
+```
+➜  data git:(main) ✗ gzcat machine_learning_challenge_labeled_data.csv.gz | cut -d, -f1 | sort | uniq -c | awk '{ print $1 }' | uniq
+1
+```
+
+Indeed, there are no customer ids with number of appearances more than
+one in this file.
+
+
+In addition, see my [EDA
+notebook](https://github.com/gbordyugov/pndapetzim/blob/main/notebooks/eda.ipynb).
+
+In genera, I don't feel quite satisfied with how much time I've spend
+looking at the data -- I would certainly take more time to get a
+better intuition of it.
+
 ## Data transformation before training
 
 
