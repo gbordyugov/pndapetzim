@@ -3,7 +3,8 @@
 ## Setting up a Python environment for the project
 
 This project uses [poetry](https://python-poetry.org/) as a build and
-dependency management tool and requires a Python starting from 3.7.1.
+dependency management tool and requires a Python version starting from
+3.7.1.
 
 The easiest way to install `poetry` is a) make sure that your current
 `python` and `pip` executables point to a compatible Python version
@@ -15,7 +16,7 @@ After cloning the repository, please run
 poetry install
 ```
 
-which will automagically creates a dedicated Python [virtual
+which will automagically create a dedicated Python [virtual
 environment](https://docs.python.org/3/tutorial/venv.html). In this
 environment, `poetry` will install all dependencies of the project.
 
@@ -39,7 +40,7 @@ show -v`.
 
 ### Note to macos BigSur users on Intel-powered machines
 
-`poetry` fails to install `numpy` from sources with this
+Currently, `poetry` fails to install `numpy` from sources with this
 configuration, you'll have to fix it by issuing
 ```
 poetry run pip install --upgrade pip
@@ -58,10 +59,10 @@ for sorting the import order.
 ## Main findings
 
 I built two neural networks to classify customers into returning and
-non-returnin ones. The results of their training are presented in the
+non-returning ones. The results of their training are presented in the
 table below.
 
-| Metric   | Small model | Big Model |
+| Metric   | Small Model | Big Model |
 |:--------:|:-----------:|:---------:|
 | Accuracy | 0.69        | 0.74      |
 | Recall   | 0.77        | 0.71      |
@@ -69,20 +70,21 @@ table below.
 
 Those reported metrics were calculated on the test data, i.e.
 customers that were not part of the training data. Those results
-suggest that it would be worth it investing more time in building a
-better model as a straight-forward feature addition and model blow-up
-didn't bring a lot of improvement.
+suggest that it seems promising to invest more time in feature
+engineering and hyperparameter optimisation.
+
 
 
 ### The small model
 
 The [small
 model](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/models.py#L18)
-accepts a sequence of 20 latest customer orders (missing orders in
-short histories are padded with zeros to the length of 20), and for
-each order the considers only the date of order and the order amount.
-It has a couple of intermediate dense layers, and the output layer has
-a single output with a sigmoid activation function.
+is a neural network that accepts a sequence of 20 latest customer
+orders (missing orders in short histories are padded with zeros to the
+length of 20). For each order the model considers only the date of
+order and the order amount. It has a couple of intermediate dense
+layers, and the output layer has a single output with a sigmoid
+activation function.
 
 The date of order is normalised in such a way that the timestamps of
 `2015-03-01` and `2017-02-28` correspond to the normalised values of 0
@@ -97,7 +99,7 @@ also accepts a sequence of 20 latest customer orders, but it takes
 into account all available features of the orders. The categorical
 features (restaurant id, city id, etc.) are encoded using embedding
 layers. After that, all features for every order are contatenated into
-a single vector, and the sequence of those vectors are connected to an
+a single vector, and the sequence of those vectors is connected to an
 [LSTM](https://en.wikipedia.org/wiki/Long_short-term_memory)-like
 architecture. The output of the bigger model is again a single-headed
 sigmoid-activation unit.
@@ -109,26 +111,25 @@ for instance,
 [here](https://en.wikipedia.org/wiki/Mean_of_circular_quantities).
 
 
-### Oversampling the positive training samples
+### Using higher weights on positive training samples
 
 As returning customers represent approx 20% of the total number of
-customers, I prescribed a relative weight of 5 to training samples
-with returning customers. This resulted in a significantly better
-values of the recall metric.
+customers, I prescribed a relative weight of 5 to the training samples
+with returning customers. This significantly improved recall.
 
 
 ### Train/test data split
 
-For the training and evaluation purposes, all data was split in such
-way that every 101st customer went into the test data, and the rest of
-the customers constituted the training data.
+For training and evaluation purposes, all data samples were split in
+such a way that every 101st customer went into the test data, and the
+rest of the customers constituted the training data.
 
 
 ## Exploratory data analysis
 
-As the data is in the CSV format, I decided to conduct the inital data
-analysis steps using the standard command line tools (you might need
-to install
+As the data is in CSV format, I decided to conduct the inital data
+analysis steps using standard command line tools (you might need to
+install
 [gzcat](https://www.freebsd.org/cgi/man.cgi?query=gzcat&sektion=1&n=1)).
 Let us see what we can learn about the data.
 
@@ -204,9 +205,9 @@ one in this file.
 In addition, see my [EDA
 notebook](https://github.com/gbordyugov/pndapetzim/blob/main/notebooks/eda.ipynb).
 
-In genera, I don't feel quite satisfied with how much time I've spend
-looking at the data -- I would certainly take more time to get a
-better intuition of it.
+In general, I don't feel quite satisfied with how much time I've spent
+looking at the data -- I would certainly take more time to get more
+insight.
 
 ## Data transformation before training
 
@@ -214,8 +215,8 @@ better intuition of it.
 ### Optimising data types
 
 I mapped user ids from strings to integers by parsing them as
-hexadecimal numbers for faster join and groupBy operations on the
-dataframe, see
+hexadecimal numbers for faster join and groupby operations on the
+dataframes, see
 [here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L81)
 and
 [here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L114).
@@ -232,7 +233,7 @@ I join the order table with the label table on the `customer_id`
 field by an inner join, see the [source
 code](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L122).
 
-I normalise the order date in such a way that the resulting date value
+I normalise order dates in such a way that the resulting date values
 are between 0 and 1, 0 meaning the stated beginning of the time window
 2015-03-01 and 1 corresponding to its end 2017-02-28, see
 [code](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L95).
