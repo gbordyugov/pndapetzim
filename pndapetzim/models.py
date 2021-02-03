@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from tensorflow.keras.layers import Embedding
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import LSTM
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 
@@ -116,12 +117,11 @@ def build_large_model(
         axis=-1,
     )
 
-    # y = Dense(30, activation='relu')(y)
-    # y = Dense(30, activation='relu')(y)
+    y = Dense(30, activation='relu')(y)
+    y = Dense(30, activation='relu')(y)
 
-    y = Flatten()(y)
-    # y = Dense(500, activation='relu')(y)
-    # y = Dense(200, activation='relu')(y)
+    y = LSTM(32)(y)
+    y = Dense(32, activation='relu')(y)
 
     classifier = Dense(1, activation='sigmoid')(y)
 
