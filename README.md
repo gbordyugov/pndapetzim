@@ -217,12 +217,12 @@ insight.
 I mapped user ids from strings to integers by parsing them as
 hexadecimal numbers for faster join and groupby operations on the
 dataframes, see
-[here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L81)
+[here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L80)
 and
-[here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L114).
+[here](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L115).
 
 I
-[mapped](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L97)
+[mapped](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L91)
 string order dates to float64 timestamps for a smaller memory
 footprint of the dataframe.
 
@@ -231,7 +231,7 @@ footprint of the dataframe.
 
 I join the order table with the label table on the `customer_id`
 field by an inner join, see the [source
-code](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L122).
+code](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L135).
 
 I normalise order dates in such a way that the resulting date values
 are between 0 and 1, 0 meaning the stated beginning of the time window
@@ -239,6 +239,6 @@ are between 0 and 1, 0 meaning the stated beginning of the time window
 [code](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L95).
 
 The order hour is
-[transformed](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L97)
+[transformed](https://github.com/gbordyugov/pndapetzim/blob/main/pndapetzim/data.py#L99)
 into a pair of cartesian coordinates representing the hour on the unit
 circle.
