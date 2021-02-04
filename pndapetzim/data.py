@@ -189,12 +189,16 @@ def encode_df(
 
 
 def pad_left(array, target_seq_len, padding_element=0):
+    """Padd array with padding_element to target_seq_len on the
+    left."""
     array = list(array[-target_seq_len:])
     padding = [padding_element] * (target_seq_len - len(array))
     return padding + array
 
 
 def pad_left_numpy(array, target_seq_len, padding_element=0):
+    """Padd array with padding_element to target_seq_len on the
+    left."""
     array = array[-target_seq_len:]
     padding = np.repeat(padding_element, target_seq_len - len(array))
     return np.concatenate((padding, array))
@@ -339,6 +343,23 @@ def load_datasets(
     train_ratio: int = 100,
     returning_weight: float = 1.0,
 ) -> Tuple[Dataset, Dataset, Dict[str, IntegerEncoding]]:
+    """Load the order data and the label data, join them and return as
+    a tensorflow.data.Datasets with train and testing data, plus
+    encoding descriptions.
+
+    Arguments:
+      order_path, label_path: str, paths to the corresponding files.
+      seq_len: int, the number of last customer orders to consider.
+      train_ratio: int, how much more data is going to be put in the
+        train set in comparison to the test set.
+      returning_weight: float, the relative weight of samples with
+        returning customers, can be seen as an "oversampling" factor.
+
+    Returns:
+      A tuple consisting of train set, test set, and a dictionary
+      mapping categorical feature names to the details of their
+      encoding.
+    """
 
     df = get_labeled_data(order_path, label_path)
     df, encodings = encode_df(df)
